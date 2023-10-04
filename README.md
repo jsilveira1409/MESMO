@@ -1,2 +1,2 @@
-# MESMS
-Modular Embedded Systems Management Software 
+# MESMO AssiM
+Modular Embedded Systems Management Software Oriented Assistance Machine
