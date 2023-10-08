@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: fprime-fpl-layout
+Version: 1.0.0
+Summary: FPP distribution package for fprime-fpl-layout
+Home-page: https://github.com/nasa/fprime
+Author: Michael Starch
+Author-email: Michael.D.Starch@jpl.nasa.gov
+License: Apache 2.0 License
+Project-URL: Issue Tracker, https://github.com/nasa/fprime/issues
+Keywords: fpp,fprime,embedded,nasa
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Requires-Python: >=3.7
+

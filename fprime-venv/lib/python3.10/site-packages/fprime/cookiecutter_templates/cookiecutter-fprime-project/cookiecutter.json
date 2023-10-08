@@ -1,0 +1,8 @@
+{
+    "project_name": "MyProject",
+    "install_venv": ["yes", "no"],
+    "__prompts__": {
+        "project_name": "Project name",
+        "install_venv": "Install F´ development tools in current virtual environment?"
+    }
+}

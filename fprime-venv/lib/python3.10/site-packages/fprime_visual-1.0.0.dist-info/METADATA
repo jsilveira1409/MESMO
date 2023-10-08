@@ -1,0 +1,34 @@
+Metadata-Version: 2.1
+Name: fprime-visual
+Version: 1.0.0
+Summary: F Prime model (FPP) visualization tool.
+Home-page: https://github.com/nasa/fprime
+Author: Thomas Boyer Chammard
+Author-email: Thomas.Boyer.Chammard@jpl.nasa.gov
+License: Apache 2.0 License
+Project-URL: Issue Tracker, https://github.com/nasa/fprime/issues
+Keywords: fprime,fpp,embedded,nasa
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.7
+License-File: LICENSE.txt
+Requires-Dist: flask (<=2.2.3,>=1.1.2)
+Requires-Dist: flask-compress (>=1.11)
+Requires-Dist: pytest (>=6.2.4)
+Requires-Dist: flask-restful (>=0.3.8)
+
+
+This package contains the Python files used to run the F´ Visualization tool. This tool is used to
+visualize FPP models.
+    
