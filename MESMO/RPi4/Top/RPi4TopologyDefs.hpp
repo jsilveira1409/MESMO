@@ -83,6 +83,10 @@ enum { WARN = 3, FATAL = 5 };
 namespace rateGroup3 {
 enum { WARN = 3, FATAL = 5 };
 }
+namespace subsystemsFileUplink {
+enum { WARN = 3, FATAL = 5 };
+}
+
 }  // namespace PingEntries
 }  // namespace RPi4
 #endif

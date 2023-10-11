@@ -42,6 +42,17 @@ module RPi4 {
     instance textLogger
     instance systemResources
 
+    # custom components
+    instance arduinoMega
+    instance arduino_deframer
+    instance arduino_framer
+    instance arduino_comm
+
+    # custom components shared components
+    instance subsystemsFileUplinkBufferManager
+    instance subsystemsStaticMemory
+    instance subsystemsFileUplink
+
     # ----------------------------------------------------------------------
     # Pattern graph specifiers
     # ----------------------------------------------------------------------
@@ -133,8 +144,30 @@ module RPi4 {
       fileUplink.bufferSendOut -> bufferManager.bufferSendIn
     }
 
+    connections SubsystemsSharedRessources {
+      
+      arduinoMega.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      arduinoMega.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      arduinoMega.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+
+      subsystemsFileUplink.bufferSendOut -> subsystemsFileUplinkBufferManager.bufferSendIn
+    }
+
     connections RPi4 {
-      # Add here connections to user-defined components
+    # downlink  
+      arduinoMega.HwPktSend -> arduino_framer.comIn
+      arduino_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      arduino_framer.framedOut -> arduino_comm.send
+      arduino_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      
+    # uplink
+      arduino_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      arduino_comm.$recv -> arduino_deframer.framedIn
+      
+      arduino_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      arduino_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      arduino_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      arduino_deframer.bufferOut -> subsystemsFileUplink.bufferSendIn
     }
 
   }

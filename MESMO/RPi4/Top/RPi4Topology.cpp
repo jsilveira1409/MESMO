@@ -57,7 +57,10 @@ enum TopologyConstants {
     DEFRAMER_BUFFER_COUNT = 30,
     COM_DRIVER_BUFFER_SIZE = 3000,
     COM_DRIVER_BUFFER_COUNT = 30,
-    BUFFER_MANAGER_ID = 200
+    BUFFER_MANAGER_ID = 200,
+    SUBSYSTEMS_DRIVER_BUFFER_SIZE = 4096,
+    SUBSYSTEMS_DRIVER_BUFFER_COUNT = 30,
+    SUBSYSTEMS_BUFFER_MANAGER_ID = 201
 };
 
 // Ping entries are autocoded, however; this code is not properly exported. Thus, it is copied here.
@@ -117,6 +120,16 @@ void configureTopology() {
     upBuffMgrBins.bins[2].numBuffers = COM_DRIVER_BUFFER_COUNT;
     bufferManager.setup(BUFFER_MANAGER_ID, 0, mallocator, upBuffMgrBins);
 
+    Svc::BufferManager::BufferBins subsystemsBuffMgrBins;
+    memset(&subsystemsBuffMgrBins, 0, sizeof(subsystemsBuffMgrBins));
+    subsystemsBuffMgrBins.bins[0].bufferSize = FRAMER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[0].numBuffers = FRAMER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[1].bufferSize = DEFRAMER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[1].numBuffers = DEFRAMER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[2].bufferSize = COM_DRIVER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[2].numBuffers = COM_DRIVER_BUFFER_COUNT;
+    subsystemsFileUplinkBufferManager.setup(BUFFER_MANAGER_ID, 0, mallocator, upBuffMgrBins);
+
     // Framer and Deframer components need to be passed a protocol handler
     framer.setup(framing);
     deframer.setup(deframing);
@@ -158,6 +171,11 @@ void setupTopology(const TopologyState& state) {
         comDriver.configure(state.hostname, state.port);
         comDriver.startSocketTask(name, true, COMM_PRIORITY, Default::STACK_SIZE);
     }
+
+    // configuring subsystems drivers
+    bool com_open = arduino_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
+    printf("com_open: %d\n", com_open);
+    arduino_comm.startReadThread();
 }
 
 // Variables used for cycle simulation

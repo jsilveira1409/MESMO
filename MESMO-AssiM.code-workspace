@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "MESMO-AssiM",
+			"path": "."
+		},
+		{
+			"name": "ClusterGate",
+			"path": "../DPhi/FS/ClusterGate"
+		}
+	],
+	"settings": {
+		"githubPullRequests.ignoredPullRequestBranches": [
+			"devel"
+		]
+	}
+}

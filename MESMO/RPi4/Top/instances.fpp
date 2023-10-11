@@ -87,6 +87,27 @@ module RPi4 {
     stack size Default.STACK_SIZE \
     priority 96
 
+  instance arduinoMega: Components.ArduinoMega base id 0x0E00 \
+    queue size Default.QUEUE_SIZE \
+    stack size Default.STACK_SIZE \
+    priority 95
+
+  instance arduino_framer : Components.SubsystemFramer base id 0x1000 
+
+  instance arduino_deframer : Components.SubsystemDeframer base id 0x1100
+  
+  instance arduino_comm: Drv.ByteStreamDriverModel base id 0x1200 type "Drv::LinuxUartDriver" at "../../Drv/LinuxUartDriver/LinuxUartDriver.hpp" 
+
+  ## subsystems Shares Ressources
+    instance subsystemsFileUplink: Svc.FileUplink base id 0x1300 \
+      queue size 100 \
+      stack size Default.STACK_SIZE \
+      priority 100
+
+  instance subsystemsFileUplinkBufferManager: Svc.BufferManager base id 0x1400
+  
+  instance subsystemsStaticMemory: Svc.StaticMemory base id 0x1500
+
   # ----------------------------------------------------------------------
   # Queued component instances
   # ----------------------------------------------------------------------

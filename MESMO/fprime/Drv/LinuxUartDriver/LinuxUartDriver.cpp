@@ -104,7 +104,7 @@ bool LinuxUartDriver::open(const char* const device,
      fcntl(fd, F_SETFL, FNDELAY); before reading to get the same result.
      */
     cfg.c_cc[VMIN] = 0;
-    cfg.c_cc[VTIME] = 10;  // 1 sec timeout on no-data
+    cfg.c_cc[VTIME] = 100;  // 1 sec timeout on no-data
 
     stat = tcsetattr(fd, TCSANOW, &cfg);
     if (-1 == stat) {

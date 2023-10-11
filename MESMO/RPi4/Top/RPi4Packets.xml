@@ -78,6 +78,20 @@
         <channel name="systemResources.CPU_15"/>
     </packet>
 
+     <packet name="subsystems" id="8" level="2">
+        <channel name="subsystemsFileUplink.PacketsReceived"/>
+        <channel name="subsystemsFileUplink.Warnings"/>
+        <channel name="subsystemsFileUplink.FilesReceived"/>
+        <channel name="arduinoMega.pirstate"/>
+        <channel name="arduinoMega.ldrVal"/>
+    
+        <channel name="subsystemsFileUplinkBufferManager.CurrBuffs"/>
+        <channel name="subsystemsFileUplinkBufferManager.HiBuffs"/>
+        <channel name="subsystemsFileUplinkBufferManager.NoBuffs"/>
+        <channel name="subsystemsFileUplinkBufferManager.EmptyBuffs"/>
+        <channel name="subsystemsFileUplinkBufferManager.TotalBuffs"/>
+    </packet>
+
     <!-- Ignored packets -->
 
     <ignore>
