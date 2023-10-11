@@ -57,7 +57,13 @@ namespace Components {
         Fw::Buffer &fwBuffer
     )
   {
-    // TODO
+    // here we transform the buffer data into the sensor telemetry
+    const U8* data = fwBuffer.getData();
+    this->tlmWrite_LED1State((bool)data[0]);
+    this->tlmWrite_LED2State((bool)data[1]);
+    this->tlmWrite_LED3State((bool)data[2]);
+    this->tlmWrite_pirState((bool)data[3]);
+    this->tlmWrite_ldrVal((U16)(data[4] << 8 | data[5]));
   }
 
   // ----------------------------------------------------------------------
@@ -102,3 +108,4 @@ namespace Components {
   }
 
 } // end namespace Components
+

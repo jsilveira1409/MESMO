@@ -164,16 +164,18 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
         U32 route_header = 0;
         U32 size = 0;
         // check buffer size 
-        //if (bufferSize < 12){
-        //    Fw::Logger::logMsg("[ERROR] Buffer size is less than 12 bytes\n");
-        //    return;
-        //}
-        //start_header = (bufferData[0] << 24) | (bufferData[1] << 16) | (bufferData[2] << 8) | bufferData[3];
-        //route_header = (bufferData[4] << 24) | (bufferData[5] << 16) | (bufferData[6] << 8) | bufferData[7];
+        if (bufferSize < 12){
+            Fw::Logger::logMsg("[ERROR] Buffer size is less than 12 bytes\n");
+            return;
+        }
+        start_header = (bufferData[0] << 24) | (bufferData[1] << 16) | (bufferData[2] << 8) | bufferData[3];
         size = (bufferData[0] << 24) | (bufferData[1] << 16) | (bufferData[2] << 8) | bufferData[3];
 
         // check whether the start header is correct
-        
+        if (start_header != 0xdeadbeef){
+            Fw::Logger::logMsg("[ERROR] Start header is incorrect\n");
+            return;
+        }        
         this->m_expectedSize = size;        
         sendStartPacket();
         sendDataPacket(bufferData , bufferSize);
@@ -181,6 +183,9 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
         this->m_receivedSize += (bufferSize );
         if (this->m_receivedSize == this->m_expectedSize){
             sendEndPacket();   
+            // we'll also forward the data to the component, for telemetry logging
+            Fw::Buffer data = this->allocate(size);
+            this->bufferOut_out(0, data);
         }
 
     }else if(this->m_receivedSize < this->m_expectedSize) {

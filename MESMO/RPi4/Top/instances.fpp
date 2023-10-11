@@ -87,7 +87,7 @@ module RPi4 {
     stack size Default.STACK_SIZE \
     priority 96
 
-  instance arduinoMega: Components.ArduinoMega base id 0x0E00 \
+  instance arduino: Components.ArduinoMega base id 0x0E00 \
     queue size Default.QUEUE_SIZE \
     stack size Default.STACK_SIZE \
     priority 95

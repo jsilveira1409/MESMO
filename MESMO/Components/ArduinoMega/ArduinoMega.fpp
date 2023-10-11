@@ -26,8 +26,12 @@ module Components {
         ##############################################################################
 
         # @ Example telemetry counter
-        telemetry ldrVal : U32
-        telemetry pirstate : bool
+        telemetry ldrVal : U16
+        telemetry pirState : bool
+        telemetry LED1State : bool
+        telemetry LED2State : bool
+        telemetry LED3State : bool
+
         
 
         # @ Example port: receiving calls from the rate group

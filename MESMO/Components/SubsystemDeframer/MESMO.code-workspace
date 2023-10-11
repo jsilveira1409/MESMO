@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../../DPhi/FS/ClusterGate"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"istream": "cpp"
+		}
+	}
+}

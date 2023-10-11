@@ -82,8 +82,11 @@
         <channel name="subsystemsFileUplink.PacketsReceived"/>
         <channel name="subsystemsFileUplink.Warnings"/>
         <channel name="subsystemsFileUplink.FilesReceived"/>
-        <channel name="arduinoMega.pirstate"/>
-        <channel name="arduinoMega.ldrVal"/>
+        <channel name="arduino.pirState"/>
+        <channel name="arduino.ldrVal"/>
+        <channel name="arduino.LED1State"/>
+        <channel name="arduino.LED2State"/>
+        <channel name="arduino.LED3State"/>
     
         <channel name="subsystemsFileUplinkBufferManager.CurrBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.HiBuffs"/>

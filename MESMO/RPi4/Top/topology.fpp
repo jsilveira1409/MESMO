@@ -43,7 +43,7 @@ module RPi4 {
     instance systemResources
 
     # custom components
-    instance arduinoMega
+    instance arduino
     instance arduino_deframer
     instance arduino_framer
     instance arduino_comm
@@ -146,16 +146,15 @@ module RPi4 {
 
     connections SubsystemsSharedRessources {
       
-      arduinoMega.FilePktSend -> subsystemsFileUplink.bufferSendIn
-      arduinoMega.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      arduinoMega.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-
+      arduino.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      arduino.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       subsystemsFileUplink.bufferSendOut -> subsystemsFileUplinkBufferManager.bufferSendIn
     }
 
     connections RPi4 {
     # downlink  
-      arduinoMega.HwPktSend -> arduino_framer.comIn
+      arduino.HwPktSend -> arduino_framer.comIn
+      
       arduino_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       arduino_framer.framedOut -> arduino_comm.send
       arduino_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
@@ -167,7 +166,9 @@ module RPi4 {
       arduino_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       arduino_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       arduino_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      arduino_deframer.bufferOut -> subsystemsFileUplink.bufferSendIn
+      arduino_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      arduino_deframer.bufferOut -> arduino.bufferSendIn
+      
     }
 
   }
