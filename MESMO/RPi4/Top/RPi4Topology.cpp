@@ -175,9 +175,9 @@ void setupTopology(const TopologyState& state) {
     printf("com_open: %d\n", com_open);
     arduino_comm.startReadThread();
 
-    //Os::TaskString CameraTask("CameraTask");
-    //camera_comm.configure("0.0.0.0", 50001);
-    //camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
+    Os::TaskString CameraTask("CameraTask");
+    camera_comm.configure("192.168.1.144", 50001);
+    camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
 
 
 }

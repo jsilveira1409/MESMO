@@ -48,6 +48,11 @@ module RPi4 {
     instance arduino_framer
     instance arduino_comm
 
+    instance camera
+    instance camera_deframer
+    instance camera_framer
+    instance camera_comm
+
     # custom components shared components
     instance subsystemsFileUplinkBufferManager
     instance subsystemsStaticMemory
@@ -152,16 +157,14 @@ module RPi4 {
       subsystemsFileUplink.bufferSendOut -> subsystemsFileUplinkBufferManager.bufferSendIn
     }
 
-    connections RPi4 {
+    connections ArduinoMega {
     # downlink  
       arduino.HwPktSend -> arduino_framer.comIn
       
       arduino_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       arduino_framer.framedOut -> arduino_comm.send
       arduino_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      
-
-      
+    
     # uplink
       arduino_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       arduino_comm.$recv -> arduino_deframer.framedIn
@@ -170,8 +173,26 @@ module RPi4 {
       arduino_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       arduino_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       arduino_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
-      arduino_deframer.bufferOut -> arduino.bufferSendIn
+      arduino_deframer.bufferOut -> arduino.bufferSendIn 
+    }
+
+    connections Rpi3Camera {
+    # downlink  
+      camera.HwPktSend -> camera_framer.comIn
       
+      camera_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      camera_framer.framedOut -> camera_comm.send
+      camera_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+    
+    # uplink
+      camera_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      camera_comm.$recv -> camera_deframer.framedIn
+      
+      camera_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      camera_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      camera_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      camera_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      camera_deframer.bufferOut -> camera.bufferSendIn 
     }
 
   }

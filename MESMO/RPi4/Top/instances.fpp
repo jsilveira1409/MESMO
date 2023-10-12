@@ -104,12 +104,12 @@ module RPi4 {
   instance arduino_comm: Drv.ByteStreamDriverModel base id 0x1002 type "Drv::LinuxUartDriver" at "../../Drv/LinuxUartDriver/LinuxUartDriver.hpp" 
 
 
-  #instance camera_framer : Components.SubsystemFramer base id 0x1010
-#
-  #instance camera_deframer : Components.SubsystemDeframer base id 0x1011
-#
-  #instance camera_comm: Drv.ByteStreamDriverModel base id 0x1012 type "Drv::TcpClient" at "../../Drv/TcpClient/TcpClient.hpp"
+  instance camera_framer : Components.SubsystemFramer base id 0x1010
 
+  instance camera_deframer : Components.SubsystemDeframer base id 0x1011
+
+  instance camera_comm: Drv.ByteStreamDriverModel base id 0x1012 type "Drv::TcpClient" at "../../Drv/TcpClient/TcpClient.hpp"
+  
   ## subsystems Shares Ressources
     instance subsystemsFileUplink: Svc.FileUplink base id 0x1300 \
       queue size 100 \
