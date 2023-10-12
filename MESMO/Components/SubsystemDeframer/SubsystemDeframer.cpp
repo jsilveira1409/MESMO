@@ -168,13 +168,16 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
         }
         start_header = (bufferData[0] << 24) | (bufferData[1] << 16) | (bufferData[2] << 8) | bufferData[3];
         size = (bufferData[4] << 24) | (bufferData[5] << 16) | (bufferData[6] << 8) | bufferData[7];
-        printf("size: %d\n", size);
         // check whether the start header is correct
         if (start_header != 0xdeadbeef){
             Fw::Logger::logMsg("[ERROR] Start header is incorrect\n");
             return;
-        }        
-        this->m_expectedSize = size;        
+        }    
+        Fw::Buffer data = this->allocate(size);
+        data.setData(bufferData + 8);
+        this->bufferOut_out(0, data);
+    
+/*      this->m_expectedSize = size;        
         sendStartPacket();
         sendDataPacket(bufferData , bufferSize);
         
@@ -186,6 +189,7 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
             Fw::Buffer data = this->allocate(size);
             this->bufferOut_out(0, data);
         }
+*/
 
     }else if(this->m_receivedSize < this->m_expectedSize) {
       // the next data bursts arrived with the data

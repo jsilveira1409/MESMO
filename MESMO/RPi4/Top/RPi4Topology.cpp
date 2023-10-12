@@ -171,7 +171,7 @@ void setupTopology(const TopologyState& state) {
     }
 
     // configuring subsystems drivers
-    bool com_open = arduino_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 100);
+    bool com_open = arduino_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 100);
     printf("com_open: %d\n", com_open);
     arduino_comm.startReadThread();
 
