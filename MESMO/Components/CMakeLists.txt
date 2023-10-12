@@ -4,3 +4,4 @@
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/ArduinoMega/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/SubsystemDeframer/")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/SubsystemFramer/")
+add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Camera/")

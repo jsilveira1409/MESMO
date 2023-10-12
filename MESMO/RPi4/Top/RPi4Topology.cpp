@@ -52,11 +52,11 @@ enum TopologyConstants {
     COMM_PRIORITY = 100,
     // bufferManager constants
     FRAMER_BUFFER_SIZE = FW_MAX(FW_COM_BUFFER_MAX_SIZE, FW_FILE_BUFFER_MAX_SIZE + sizeof(U32)) + HASH_DIGEST_LENGTH + Svc::FpFrameHeader::SIZE,
-    FRAMER_BUFFER_COUNT = 30,
+    FRAMER_BUFFER_COUNT = 10,
     DEFRAMER_BUFFER_SIZE = FW_MAX(FW_COM_BUFFER_MAX_SIZE, FW_FILE_BUFFER_MAX_SIZE + sizeof(U32)),
-    DEFRAMER_BUFFER_COUNT = 30,
+    DEFRAMER_BUFFER_COUNT = 10,
     COM_DRIVER_BUFFER_SIZE = 3000,
-    COM_DRIVER_BUFFER_COUNT = 30,
+    COM_DRIVER_BUFFER_COUNT = 20,
     BUFFER_MANAGER_ID = 200,
     SUBSYSTEMS_DRIVER_BUFFER_SIZE = 4096,
     SUBSYSTEMS_DRIVER_BUFFER_COUNT = 30,
@@ -108,8 +108,8 @@ void configureTopology() {
 
     // Health is supplied a set of ping entires.
     health.setPingEntries(pingEntries, FW_NUM_ARRAY_ELEMENTS(pingEntries), HEALTH_WATCHDOG_CODE);
-
-    // Buffer managers need a configured set of buckets and an allocator used to allocate memory for those buckets.
+    
+   // Buffer managers need a configured set of buckets and an allocator used to allocate memory for those buckets.
     Svc::BufferManager::BufferBins upBuffMgrBins;
     memset(&upBuffMgrBins, 0, sizeof(upBuffMgrBins));
     upBuffMgrBins.bins[0].bufferSize = FRAMER_BUFFER_SIZE;
@@ -122,14 +122,12 @@ void configureTopology() {
 
     Svc::BufferManager::BufferBins subsystemsBuffMgrBins;
     memset(&subsystemsBuffMgrBins, 0, sizeof(subsystemsBuffMgrBins));
-    subsystemsBuffMgrBins.bins[0].bufferSize = FRAMER_BUFFER_SIZE;
-    subsystemsBuffMgrBins.bins[0].numBuffers = FRAMER_BUFFER_COUNT;
-    subsystemsBuffMgrBins.bins[1].bufferSize = DEFRAMER_BUFFER_SIZE;
-    subsystemsBuffMgrBins.bins[1].numBuffers = DEFRAMER_BUFFER_COUNT;
-    subsystemsBuffMgrBins.bins[2].bufferSize = COM_DRIVER_BUFFER_SIZE;
-    subsystemsBuffMgrBins.bins[2].numBuffers = COM_DRIVER_BUFFER_COUNT;
-    subsystemsFileUplinkBufferManager.setup(BUFFER_MANAGER_ID, 0, mallocator, upBuffMgrBins);
+    subsystemsBuffMgrBins.bins[0].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[0].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
+    subsystemsFileUplinkBufferManager.setup(SUBSYSTEMS_BUFFER_MANAGER_ID, 0, mallocator, subsystemsBuffMgrBins);
 
+
+    printf("flag \n");
     // Framer and Deframer components need to be passed a protocol handler
     framer.setup(framing);
     deframer.setup(deframing);
@@ -173,9 +171,15 @@ void setupTopology(const TopologyState& state) {
     }
 
     // configuring subsystems drivers
-    bool com_open = arduino_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
+    bool com_open = arduino_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 100);
     printf("com_open: %d\n", com_open);
     arduino_comm.startReadThread();
+
+    //Os::TaskString CameraTask("CameraTask");
+    //camera_comm.configure("0.0.0.0", 50001);
+    //camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
+
+
 }
 
 // Variables used for cycle simulation
@@ -216,5 +220,6 @@ void teardownTopology(const TopologyState& state) {
     // Resource deallocation
     cmdSeq.deallocateBuffer(mallocator);
     bufferManager.cleanup();
+    subsystemsFileUplinkBufferManager.cleanup();
 }
 };  // namespace RPi4

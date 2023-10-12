@@ -1,7 +1,7 @@
 module Components {
     @ Perovskia Cells payload, which reads voltage and current values of the solar cells
     active component ArduinoMega {
-        enum Commands {
+        enum Commands{
             TOGGLE_LED1 = 0x01
             TOGGLE_LED2 = 0x02
             TOGGLE_LED3  = 0x03

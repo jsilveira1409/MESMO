@@ -92,11 +92,23 @@ module RPi4 {
     stack size Default.STACK_SIZE \
     priority 95
 
+  instance camera: Components.Camera base id 0x0F00 \
+    queue size Default.QUEUE_SIZE \
+    stack size Default.STACK_SIZE \
+    priority 94
+
   instance arduino_framer : Components.SubsystemFramer base id 0x1000 
 
-  instance arduino_deframer : Components.SubsystemDeframer base id 0x1100
+  instance arduino_deframer : Components.SubsystemDeframer base id 0x1001
   
-  instance arduino_comm: Drv.ByteStreamDriverModel base id 0x1200 type "Drv::LinuxUartDriver" at "../../Drv/LinuxUartDriver/LinuxUartDriver.hpp" 
+  instance arduino_comm: Drv.ByteStreamDriverModel base id 0x1002 type "Drv::LinuxUartDriver" at "../../Drv/LinuxUartDriver/LinuxUartDriver.hpp" 
+
+
+  #instance camera_framer : Components.SubsystemFramer base id 0x1010
+#
+  #instance camera_deframer : Components.SubsystemDeframer base id 0x1011
+#
+  #instance camera_comm: Drv.ByteStreamDriverModel base id 0x1012 type "Drv::TcpClient" at "../../Drv/TcpClient/TcpClient.hpp"
 
   ## subsystems Shares Ressources
     instance subsystemsFileUplink: Svc.FileUplink base id 0x1300 \

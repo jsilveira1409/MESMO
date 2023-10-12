@@ -71,7 +71,7 @@ namespace Components {
         // There is: process the data
         processBuffer(recvBuffer);
         //print recvBuffer size 
-        Fw::Logger::logMsg("[INFO] RecvBuffer size: %d\n", recvBuffer.getSize());
+        //Fw::Logger::logMsg("[INFO] RecvBuffer size: %d\n", recvBuffer.getSize());
     }
     // Deallocate the buffer
     framedDeallocate_out(0, recvBuffer);
@@ -153,24 +153,22 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
     const U32 bufferSize = buffer.getSize();
     U8 *const bufferData = buffer.getData();
     
-    
     // check whether the expected size of the incoming bytestream is 0, 
     // which means it's a new bytestream and we should check for the header
-    printf("bufferSize: %d\n", bufferSize);
-    printf("m_expectedSize: %d\n", this->m_expectedSize);
+    
 
     if (this->m_expectedSize == 0){
         U32 start_header = 0;
         U32 route_header = 0;
         U32 size = 0;
         // check buffer size 
-        if (bufferSize < 12){
-            Fw::Logger::logMsg("[ERROR] Buffer size is less than 12 bytes\n");
+        if (bufferSize < 8){
+            Fw::Logger::logMsg("[ERROR] Buffer size is less than 8 bytes\n");
             return;
         }
         start_header = (bufferData[0] << 24) | (bufferData[1] << 16) | (bufferData[2] << 8) | bufferData[3];
-        size = (bufferData[0] << 24) | (bufferData[1] << 16) | (bufferData[2] << 8) | bufferData[3];
-
+        size = (bufferData[4] << 24) | (bufferData[5] << 16) | (bufferData[6] << 8) | bufferData[7];
+        printf("size: %d\n", size);
         // check whether the start header is correct
         if (start_header != 0xdeadbeef){
             Fw::Logger::logMsg("[ERROR] Start header is incorrect\n");
@@ -180,7 +178,8 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
         sendStartPacket();
         sendDataPacket(bufferData , bufferSize);
         
-        this->m_receivedSize += (bufferSize );
+        this->m_receivedSize += (bufferSize - 8);
+        printf("received size: %d\n", this->m_receivedSize);
         if (this->m_receivedSize == this->m_expectedSize){
             sendEndPacket();   
             // we'll also forward the data to the component, for telemetry logging

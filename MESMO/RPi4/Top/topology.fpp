@@ -120,6 +120,7 @@ module RPi4 {
       rateGroup3.RateGroupMemberOut[0] -> $health.Run
       rateGroup3.RateGroupMemberOut[1] -> blockDrv.Sched
       rateGroup3.RateGroupMemberOut[2] -> bufferManager.schedIn
+      rateGroup3.RateGroupMemberOut[3] -> subsystemsFileUplinkBufferManager.schedIn
     }
 
     connections Sequencer {
@@ -146,8 +147,8 @@ module RPi4 {
 
     connections SubsystemsSharedRessources {
       
-      arduino.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      arduino.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      #arduino.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      #arduino.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       subsystemsFileUplink.bufferSendOut -> subsystemsFileUplinkBufferManager.bufferSendIn
     }
 
@@ -158,6 +159,8 @@ module RPi4 {
       arduino_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       arduino_framer.framedOut -> arduino_comm.send
       arduino_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      
+
       
     # uplink
       arduino_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
