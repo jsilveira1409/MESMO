@@ -6,6 +6,8 @@ import struct
 import time
 import picamera
 import picamera.array
+import cv2
+import numpy as np
 
 
 
@@ -33,7 +35,10 @@ def decode_cmd(data):
         output = picamera.array.PiRGBArray(camera)
         camera.capture(output, 'rgb')
         img_data = output.array
-        return_data = return_data.encode()
+
+        # Convert numpy array to JPEG in memory using OpenCV
+        retval, buffer = cv2.imencode('.jpg', img_data)
+        return_data = buffer.tobytes()
     elif data == cmds["SendStatus"]:
         print("Sending Current Status")
         return_data = "Payload Status: Doing great"
@@ -66,7 +71,9 @@ def runTCP():
                     data = conn.recv(int.from_bytes(data_lentgh, "big"))
                     print(f"Received {data}")
                     return_data = decode_cmd(data)
-                    conn.send(b'\xde\xad\xbe\xef' + struct.pack('>I', len(return_data)) + return_data)
+                    data = b'\xde\xad\xbe\xef' + struct.pack('>I', len(return_data)) + return_data
+                    print(f"Sending {len(return_data)}")
+                    conn.send(data)
                 time.sleep(0.2)                
         finally:
             conn.close()

@@ -11,6 +11,7 @@
 
 namespace Components {
 
+  // Component Implementation Class
   class ArduinoMega :
     public ArduinoMegaComponentBase
   {

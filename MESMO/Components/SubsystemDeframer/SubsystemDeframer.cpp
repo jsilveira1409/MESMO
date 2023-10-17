@@ -20,17 +20,11 @@ namespace Components {
   // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
-  SubsystemDeframer ::
-    SubsystemDeframer(
-        const char *const compName
-    ) : SubsystemDeframerComponentBase(compName),
-        DeframingProtocolInterface()
-  {
-    (void) memset(m_pollBuffer, 0, sizeof m_pollBuffer);
-    this->m_expectedSize = 0;
-    this->m_receivedSize = 0;
-    this->m_routeOption = FILE_PACKET;
-    this->m_pktIndex = 0;
+  SubsystemDeframer :: SubsystemDeframer(const char *const compName) : 
+    SubsystemDeframerComponentBase(compName),DeframingProtocolInterface(){
+        this->m_expectedSize = 0;
+        this->m_receivedSize = 0;
+        this->m_pktIndex = 0;
 
   }
 
@@ -64,14 +58,10 @@ namespace Components {
         const NATIVE_INT_TYPE portNum,
         Fw::Buffer &recvBuffer,
         const Drv::RecvStatus &recvStatus
-    )
-  {
-    // Check whether there is data to process
+    ){
     if (recvStatus.e == Drv::RecvStatus::RECV_OK) {
-        // There is: process the data
         processBuffer(recvBuffer);
-        //print recvBuffer size 
-        //Fw::Logger::logMsg("[INFO] RecvBuffer size: %d\n", recvBuffer.getSize());
+        Fw::Logger::logMsg("[INFO] RecvBuffer size: %d\n", recvBuffer.getSize());
     }
     // Deallocate the buffer
     framedDeallocate_out(0, recvBuffer);
@@ -105,31 +95,15 @@ void SubsystemDeframer ::route(Fw::Buffer& packetBuffer) {
     bool deallocate = true;
     // Process the packet
     if (status == Fw::FW_SERIALIZE_OK) {
-        if (this->m_routeOption == FILE_PACKET){
-
             U8 *const packetData = packetBuffer.getData();
             const U32 packetSize = packetBuffer.getSize();
-            // If the file uplink output port is connected,
-            // send the file packet. Otherwise take no action.
-            if (isConnected_bufferOut_OutputPort(0)) {
+
+            if (isConnected_FilePktSend_OutputPort(0)) {
                 // Send the packet buffer
-                bufferOut_out(0, packetBuffer);
+                FilePktSend_out(0, packetBuffer);
                 // Transfer ownership of the buffer to the receiver
                 deallocate = false;
             }
-        }else if(this->m_routeOption == SW_PACKET){
-            // If the software uplink output port is connected,
-            // send the software packet. Otherwise take no action.
-            //Fw::ComBuffer comBuffer(packetBuffer.getData(), packetBuffer.getSize());
-            
-            if (isConnected_SwPktSend_OutputPort(0)) {
-                // Send the packet buffer
-                //comOut_out(0, comBuffer, 0);
-                SwPktSend_out(0, packetBuffer);
-                // Transfer ownership of the buffer to the receiver
-                deallocate = false;
-            }
-        }
     }else {
         Fw::Logger::logMsg(
             "[ERROR] Deserializing packet type failed with status %d\n",
@@ -155,99 +129,118 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
     
     // check whether the expected size of the incoming bytestream is 0, 
     // which means it's a new bytestream and we should check for the header
-    
 
     if (this->m_expectedSize == 0){
         U32 start_header = 0;
-        U32 route_header = 0;
         U32 size = 0;
         // check buffer size 
         if (bufferSize < 8){
             Fw::Logger::logMsg("[ERROR] Buffer size is less than 8 bytes\n");
             return;
         }
+
         start_header = (bufferData[0] << 24) | (bufferData[1] << 16) | (bufferData[2] << 8) | bufferData[3];
         size = (bufferData[4] << 24) | (bufferData[5] << 16) | (bufferData[6] << 8) | bufferData[7];
-        // check whether the start header is correct
-        if (start_header != 0xdeadbeef){
-            Fw::Logger::logMsg("[ERROR] Start header is incorrect\n");
-            return;
-        }    
-        Fw::Buffer data = this->allocate(size);
-        data.setData(bufferData + 8);
-        this->bufferOut_out(0, data);
-    
-/*      this->m_expectedSize = size;        
-        sendStartPacket();
-        sendDataPacket(bufferData , bufferSize);
         
-        this->m_receivedSize += (bufferSize - 8);
-        printf("received size: %d\n", this->m_receivedSize);
-        if (this->m_receivedSize == this->m_expectedSize){
-            sendEndPacket();   
-            // we'll also forward the data to the component, for telemetry logging
-            Fw::Buffer data = this->allocate(size);
-            this->bufferOut_out(0, data);
-        }
-*/
+        // check whether the start header is correct
+        if (start_header == 0xdeadbeef){
+             
+          this->m_expectedSize = size;                  // total size of the incoming data, which can come in multiple packets
+          sendStartPacket();
+          sendDataPacket(bufferData + 8 , bufferSize - 8); 
 
-    }else if(this->m_receivedSize < this->m_expectedSize) {
+          // means it is a small telemetry packet
+          if (this->m_expectedSize == this->m_receivedSize){
+              printf("size of data received: %d\n", bufferSize-8);
+              printf("expected size: %d\n", this->m_expectedSize);
+              printf("received size: %d\n", this->m_receivedSize);
+
+              printf("%d %d \n", bufferData, bufferData + 8);
+              // we directly forward it to the component so that it can publish
+              // the values into the telemetry channels
+              Fw::Buffer data = this->allocate(size);
+              if (data.getData() == NULL) {
+                  Fw::Logger::logMsg("[ERROR] Failed to allocate buffer\n");
+                  return;
+              }
+              data.setData(bufferData + 8);
+              this->bufferOut_out(0, data);
+              
+              sendEndPacket();
+                      
+          }
+        }
+
+    }else if(this->m_receivedSize <= this->m_expectedSize) {
       // the next data bursts arrived with the data
       sendDataPacket(bufferData, bufferSize);
-      this->m_receivedSize += bufferSize;
 
       if (this->m_receivedSize == this->m_expectedSize){
         sendEndPacket();
-        this->m_expectedSize = 0;
-        this->m_receivedSize = 0;
-        this->m_routeOption = FILE_PACKET;
 
       }else if (this->m_receivedSize > this->m_expectedSize){
         Fw::Logger::logMsg("[ERROR] Received size is greater than expected size\n");
         this->m_expectedSize = 0;
         this->m_receivedSize = 0;
-        this->m_routeOption = FILE_PACKET;
       }
     }
 }
 
 void SubsystemDeframer ::sendStartPacket(){
+    printf("send start packet\n");
   Fw::FilePacket::StartPacket startPacket;
-  const char* source = "source";
-  const char* destination = "test";  
+  char source[10];  // Ensure this buffer is large enough
+  sprintf(source, "source%d", this->m_fileIndex);
+  char destination[10];  // Ensure this buffer is large enough
+  sprintf(destination, "file%d", this->m_fileIndex);
   startPacket.initialize(this->m_expectedSize, source, destination);
   filePacket.fromStartPacket(startPacket);
   Fw::Buffer startBuffer = this->allocate(filePacket.bufferSize());
+  if (startBuffer.getData() == NULL) {
+    Fw::Logger::logMsg("[ERROR] Failed to allocate buffer\n");
+    return;
+  }
   Fw::SerializeStatus status = filePacket.toBuffer(startBuffer);
   //TODO route the packet to fileUplink
   this->route(startBuffer);
-  this->m_pktIndex ++;   
+  this->m_pktIndex ++;
+  this->m_fileIndex ++;
 }
 
 void SubsystemDeframer ::sendDataPacket(U8 *const bufferData, const U32 bufferSize){
+  printf("send data packet nb %d\n", this->m_pktIndex);
   Fw::FilePacket::DataPacket dataPacket;
   dataPacket.initialize(this->m_pktIndex, this->m_receivedSize, bufferSize, bufferData);
   filePacket.fromDataPacket(dataPacket);
   Fw::Buffer dataBuffer = this->allocate(filePacket.bufferSize());
+  if (dataBuffer.getData() == NULL) {
+    Fw::Logger::logMsg("[ERROR] Failed to allocate buffer\n");
+    return;
+  }
   Fw::SerializeStatus status = filePacket.toBuffer(dataBuffer);
   //TODO route the packet to fileUplink
   this->route(dataBuffer);
+  this->m_receivedSize += bufferSize;
   this->m_pktIndex ++;
 }
 
 void SubsystemDeframer ::sendEndPacket(){
+    printf("send end packet\n");
   Fw::FilePacket::EndPacket endPacket;
   U32 checksum = 0; // TODO calculate checksum
   endPacket.initialize(this->m_pktIndex, checksum);
   filePacket.fromEndPacket(endPacket);
   Fw::Buffer endBuffer = this->allocate(filePacket.bufferSize());
+  if (endBuffer.getData() == NULL) {
+    Fw::Logger::logMsg("[ERROR] Failed to allocate buffer\n");
+    return;
+  }
   Fw::SerializeStatus status = filePacket.toBuffer(endBuffer);
   //TODO route the packet to fileUplink
   this->route(endBuffer);
   this->m_pktIndex = 0;
   this->m_expectedSize = 0;
   this->m_receivedSize = 0;
-  this->m_routeOption = FILE_PACKET;
 }
 
 } // end namespace Components

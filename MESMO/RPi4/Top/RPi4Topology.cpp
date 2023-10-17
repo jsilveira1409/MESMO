@@ -11,9 +11,11 @@
 #include <Fw/Types/MallocAllocator.hpp>
 #include <Os/Log.hpp>
 #include <Svc/FramingProtocol/FprimeProtocol.hpp>
+#include <Svc/FramingProtocol/DeframingProtocol.hpp>
 
 // Used for 1Hz synthetic cycling
 #include <Os/Mutex.hpp>
+
 
 // Allows easy reference to objects in FPP/autocoder required namespaces
 using namespace RPi4;
@@ -29,6 +31,7 @@ Fw::MallocAllocator mallocator;
 // framing and deframing implementations.
 Svc::FprimeFraming framing;
 Svc::FprimeDeframing deframing;
+
 
 Svc::ComQueue::QueueConfigurationTable configurationTable;
 
@@ -55,10 +58,10 @@ enum TopologyConstants {
     FRAMER_BUFFER_COUNT = 10,
     DEFRAMER_BUFFER_SIZE = FW_MAX(FW_COM_BUFFER_MAX_SIZE, FW_FILE_BUFFER_MAX_SIZE + sizeof(U32)),
     DEFRAMER_BUFFER_COUNT = 10,
-    COM_DRIVER_BUFFER_SIZE = 3000,
+    COM_DRIVER_BUFFER_SIZE = 491520,
     COM_DRIVER_BUFFER_COUNT = 20,
     BUFFER_MANAGER_ID = 200,
-    SUBSYSTEMS_DRIVER_BUFFER_SIZE = 4096,
+    SUBSYSTEMS_DRIVER_BUFFER_SIZE = 491520,
     SUBSYSTEMS_DRIVER_BUFFER_COUNT = 30,
     SUBSYSTEMS_BUFFER_MANAGER_ID = 201
 };
@@ -124,10 +127,12 @@ void configureTopology() {
     memset(&subsystemsBuffMgrBins, 0, sizeof(subsystemsBuffMgrBins));
     subsystemsBuffMgrBins.bins[0].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
     subsystemsBuffMgrBins.bins[0].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[1].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[1].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[2].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[2].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
     subsystemsFileUplinkBufferManager.setup(SUBSYSTEMS_BUFFER_MANAGER_ID, 0, mallocator, subsystemsBuffMgrBins);
 
-
-    printf("flag \n");
     // Framer and Deframer components need to be passed a protocol handler
     framer.setup(framing);
     deframer.setup(deframing);
@@ -176,7 +181,7 @@ void setupTopology(const TopologyState& state) {
     arduino_comm.startReadThread();
 
     Os::TaskString CameraTask("CameraTask");
-    camera_comm.configure("192.168.1.144", 50001);
+    camera_comm.configure("0.0.0.0", 50001);
     camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
 
 

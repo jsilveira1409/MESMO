@@ -114,16 +114,10 @@ namespace Components {
       // Member variables
       // ----------------------------------------------------------------------
 
-      enum route_t{
-        FILE_PACKET = 0xdeadbeef,
-        SW_PACKET = 0xcafecafe, 
-        NONE
-      };
-
       //! The Expected size of the incoming bytestream, which can come in multiple packets, in bytes
-        U32 m_expectedSize;
-        // the size of the incoming bytestream, in bytes, that we already received and processed
-        U32 m_receivedSize;
+    U32 m_expectedSize;
+    // the size of the incoming bytestream, in bytes, that we already received and processed
+    U32 m_receivedSize;
 
       //! The DeframingProtocol implementation
       Svc::DeframingProtocol* m_protocol;
@@ -132,14 +126,9 @@ namespace Components {
       //Types::CircularBuffer m_inRing;
       U8 m_buffer[4096] = {0};
 
-      //! Memory for the circular buffer
-      //U8 m_ringBuffer[Svc::DeframerCfg::RING_BUFFER_SIZE];
-
-      //! Memory for the polling buffer
-      U8 m_pollBuffer[Svc::DeframerCfg::POLL_BUFFER_SIZE];
-
-      route_t m_routeOption;
       U32 m_pktIndex = 0;
+
+      U32 m_fileIndex = 0;
 
     };
 

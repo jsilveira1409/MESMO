@@ -3,3 +3,4 @@
 
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Components")
 add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/RPi4/")
+add_fprime_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Native/")
