@@ -174,11 +174,11 @@ void setupTopology(const TopologyState& state) {
         comDriver.configure(state.hostname, state.port);
         comDriver.startSocketTask(name, true, COMM_PRIORITY, Default::STACK_SIZE);
     }
+    bool com_open = mega_comm.open("/dev/ttyACM1", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_EVEN, 1024);
 
     // configuring subsystems drivers
-    bool com_open = arduino_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 100);
     printf("com_open: %d\n", com_open);
-    arduino_comm.startReadThread();
+    mega_comm.startReadThread();
 
     Os::TaskString CameraTask("CameraTask");
     camera_comm.configure("0.0.0.0", 50001);

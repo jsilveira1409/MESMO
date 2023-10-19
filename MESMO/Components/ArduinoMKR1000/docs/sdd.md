@@ -1,6 +1,6 @@
 # Components::ArduinoMega
 
-Component for F Prime FSW framework.
+Arduino Mega control and interface component
 
 ## Usage Examples
 Add usage examples here

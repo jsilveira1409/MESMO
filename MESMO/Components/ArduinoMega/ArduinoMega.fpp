@@ -1,12 +1,17 @@
 module Components {
-    @ Perovskia Cells payload, which reads voltage and current values of the solar cells
+    @ Component for F Prime FSW framework.
     active component ArduinoMega {
-        enum Commands{
-            TOGGLE_LED1 = 0x01
-            TOGGLE_LED2 = 0x02
-            TOGGLE_LED3  = 0x03
-            SEND_TELEMETRY = 0x04
-            STOP_TELEMETRY = 0x05
+        
+        enum MoveCommands{
+            SERVO_SHOULDER_SET = 0x01
+            SERVO_ELBOW_SET = 0x02
+            SERVO_SHOULDER_SWEEP = 0x03
+            SERVO_ELBOW_SWEEP = 0x04
+        }
+
+        enum ConfigCommands{
+            SERVO_SHOULDER_SPEED = 0x05
+            SERVO_ELBOW_SPEED = 0x06
         }
         
         @ Command to send a string to the Payload
@@ -16,42 +21,22 @@ module Components {
         opcode 0
 
         @ Command to send a defined command to the Payload
-        async command SendCommand (
-                                    payloadcommand : Commands
+        async command MoveServo (
+                                    cmd : MoveCommands, 
+                                    angle : U8
                                 ) \
         opcode 1
 
-        ##############################################################################
-        #### Uncomment the following examples to start customizing your component ####
-        ##############################################################################
+        @ Command to send a defined command to the Payload
+        async command ConfigureServoSpeed (
+                                    cmd : ConfigCommands, 
+                                    speed : U8        
+                                ) \
+        opcode 2
 
-        # @ Example telemetry counter
-        telemetry ldrVal : U16
-        telemetry pirState : bool
-        telemetry LED1State : bool
-        telemetry LED2State : bool
-        telemetry LED3State : bool
 
-        
-
-        # @ Example port: receiving calls from the rate group
-        # sync input port run: Svc.Sched
-
-        # -------------------------------------------------
-        # General ports
-        # -------------------------------------------------
-
-        @ Input Scheduler port 
+         @ Input Scheduler port 
         async input port Run: Svc.Sched
-
-        @ Output Com port for sending data to the Hardware payload
-        output port HwPktSend: Fw.Com
-
-        @ Output Com port for sending data to the Software payload
-        output port SwPktSend: Fw.Com
-
-        @ Input Byte port for receiving data from the payload
-        async input port PktRecv: Drv.ByteStreamRecv
 
         @ deallocate
         output port deallocate : Fw.BufferSend
@@ -59,13 +44,11 @@ module Components {
         @ allocate
         output port allocate : Fw.BufferGet
 
-        @ input port 
-        async input port bufferSendIn : Fw.BufferSend
+        async input port bufferSendIn: Fw.BufferSend
 
-        @ file packet port
-        output port FilePktSend: Fw.BufferSend
+        output port PktSend : Fw.Com
 
-
+        
         ###############################################################################
         # Standard AC Ports: Required for Channels, Events, Commands, and Parameters  #
         ###############################################################################

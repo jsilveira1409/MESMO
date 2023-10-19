@@ -61,7 +61,7 @@ namespace Components {
     ){
     if (recvStatus.e == Drv::RecvStatus::RECV_OK) {
         processBuffer(recvBuffer);
-        Fw::Logger::logMsg("[INFO] RecvBuffer size: %d\n", recvBuffer.getSize());
+        //Fw::Logger::logMsg("[INFO] RecvBuffer size: %d\n", recvBuffer.getSize());
     }
     // Deallocate the buffer
     framedDeallocate_out(0, recvBuffer);
@@ -127,15 +127,12 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
     const U32 bufferSize = buffer.getSize();
     U8 *const bufferData = buffer.getData();
     
-    // check whether the expected size of the incoming bytestream is 0, 
-    // which means it's a new bytestream and we should check for the header
-
     if (this->m_expectedSize == 0){
         U32 start_header = 0;
         U32 size = 0;
         // check buffer size 
         if (bufferSize < 8){
-            Fw::Logger::logMsg("[ERROR] Buffer size is less than 8 bytes\n");
+            //Fw::Logger::logMsg("[ERROR] Buffer size is less than 8 bytes\n");
             return;
         }
 
@@ -151,11 +148,6 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
 
           // means it is a small telemetry packet
           if (this->m_expectedSize == this->m_receivedSize){
-              printf("size of data received: %d\n", bufferSize-8);
-              printf("expected size: %d\n", this->m_expectedSize);
-              printf("received size: %d\n", this->m_receivedSize);
-
-              printf("%d %d \n", bufferData, bufferData + 8);
               // we directly forward it to the component so that it can publish
               // the values into the telemetry channels
               Fw::Buffer data = this->allocate(size);
@@ -187,7 +179,7 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
 }
 
 void SubsystemDeframer ::sendStartPacket(){
-    printf("send start packet\n");
+  printf("send start packet\n");
   Fw::FilePacket::StartPacket startPacket;
   char source[10];  // Ensure this buffer is large enough
   sprintf(source, "source%d", this->m_fileIndex);

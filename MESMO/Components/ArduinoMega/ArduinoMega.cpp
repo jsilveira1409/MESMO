@@ -32,17 +32,7 @@ namespace Components {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void ArduinoMega ::
-    PktRecv_handler(
-        const NATIVE_INT_TYPE portNum,
-        Fw::Buffer &recvBuffer,
-        const Drv::RecvStatus &recvStatus
-    )
-  {
-    // TODO
-  }
-
-  void ArduinoMega ::
+    void ArduinoMega ::
     Run_handler(
         const NATIVE_INT_TYPE portNum,
         NATIVE_UINT_TYPE context
@@ -57,14 +47,13 @@ namespace Components {
         Fw::Buffer &fwBuffer
     )
   {
-    // here we transform the buffer data into the sensor telemetry
-    const U8* data = fwBuffer.getData();
-    //print data
-    this->tlmWrite_LED1State((bool)data[0]);
-    this->tlmWrite_LED2State((bool)data[1]);
-    this->tlmWrite_LED3State((bool)data[2]);
-    this->tlmWrite_pirState((bool)data[3]);
-    this->tlmWrite_ldrVal((U16)(data[4] << 8 | data[5]));
+    // print out the data in ascii
+    U8* data = (U8*)fwBuffer.getData();
+    printf("Received: %c\n", data[0]);
+    for (U32 i = 0; i < fwBuffer.getSize(); i++) {
+      printf("%c", data[i]);
+    }
+    printf("\n");
   }
 
   // ----------------------------------------------------------------------
@@ -78,35 +67,41 @@ namespace Components {
         const Fw::CmdStringArg& text
     )
   {
-    Fw::ComBuffer arg;
-    U8* textPtr = (U8*)text.toChar();
-    U32 size = text.getCapacity();
-    arg = Fw::ComBuffer(textPtr, size);
-    //U32 size = arg.getBuffLength();
-
-    this->HwPktSend_out(0, arg, 0);
+    // TODO
     this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
   }
 
   void ArduinoMega ::
-    SendCommand_cmdHandler(
+    MoveServo_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq,
-        Components::ArduinoMega_Commands payloadcommand
-    ){
-    const U32 size = sizeof(payloadcommand.e);
-    U8 data[size];
-    data[0] = (U8) (payloadcommand.e >> 24);
-    data[1] = (U8) (payloadcommand.e >> 16);
-    data[2] = (U8) (payloadcommand.e >> 8);
-    data[3] = (U8) payloadcommand.e;
-
-    
+        Components::ArduinoMega_MoveCommands cmd,
+        U8 angle
+    )
+  {
+    const U32 size =2;
+    U8 data[2] = {cmd.e, angle};
     Fw::ComBuffer arg(data, size);
     
-    this->HwPktSend_out(0, arg, 0);
+    this->PktSend_out(0, arg, 0);
+    this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
+  }
+
+  void ArduinoMega ::
+    ConfigureServoSpeed_cmdHandler(
+        const FwOpcodeType opCode,
+        const U32 cmdSeq,
+        Components::ArduinoMega_ConfigCommands cmd,
+        U8 speed
+    )
+  {
+
+    const U32 size = 2;
+    U8 data[2] = {cmd.e, speed};
+    Fw::ComBuffer arg(data, size);
+    
+    this->PktSend_out(0, arg, 0);
     this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
   }
 
 } // end namespace Components
-

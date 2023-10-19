@@ -361,8 +361,7 @@ void LinuxUartDriver ::startReadThread(NATIVE_UINT_TYPE priority,
                                        NATIVE_UINT_TYPE stackSize,
                                        NATIVE_UINT_TYPE cpuAffinity) {
     Os::TaskString task("SerReader");
-    Os::Task::TaskStatus stat =
-        this->m_readTask.start(task, serialReadTaskEntry, this, priority, stackSize, cpuAffinity);
+    Os::Task::TaskStatus stat = this->m_readTask.start(task, serialReadTaskEntry, this, priority, stackSize, cpuAffinity);
     FW_ASSERT(stat == Os::Task::TASK_OK, stat);
 }
 

@@ -82,11 +82,13 @@
         <channel name="subsystemsFileUplink.PacketsReceived"/>
         <channel name="subsystemsFileUplink.Warnings"/>
         <channel name="subsystemsFileUplink.FilesReceived"/>
-        <channel name="arduino.pirState"/>
-        <channel name="arduino.ldrVal"/>
-        <channel name="arduino.LED1State"/>
-        <channel name="arduino.LED2State"/>
-        <channel name="arduino.LED3State"/>
+        <channel name="mkr1000.pirState"/>
+        <channel name="mkr1000.ldrVal"/>
+        <channel name="mkr1000.LED1State"/>
+        <channel name="mkr1000.LED2State"/>
+        <channel name="mkr1000.LED3State"/>
+        <channel name="mega_comm.BytesRecv"/>
+        <channel name="mega_comm.BytesSent"/>
     
         <channel name="subsystemsFileUplinkBufferManager.CurrBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.HiBuffs"/>

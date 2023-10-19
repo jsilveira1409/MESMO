@@ -43,15 +43,20 @@ module RPi4 {
     instance systemResources
 
     # custom components
-    instance arduino
-    instance arduino_deframer
-    instance arduino_framer
-    instance arduino_comm
+    instance mkr1000
+    instance mkr1000_deframer
+    instance mkr1000_framer
+    instance mkr1000_comm
 
     instance camera
     instance camera_deframer
     instance camera_framer
     instance camera_comm
+
+    instance mega
+    instance mega_comm
+    instance mega_deframer
+    instance mega_framer
 
     # custom components shared components
     instance subsystemsFileUplinkBufferManager
@@ -152,28 +157,26 @@ module RPi4 {
 
     connections SubsystemsSharedRessources {
       
-      #arduino.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      #arduino.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      #mkr1000.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      #mkr1000.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       subsystemsFileUplink.bufferSendOut -> subsystemsFileUplinkBufferManager.bufferSendIn
     }
 
-    connections ArduinoMega {
+    connections MKR1000 {
     # downlink  
-      arduino.HwPktSend -> arduino_framer.comIn
+      mkr1000.HwPktSend -> mkr1000_framer.comIn
+      mkr1000_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mkr1000_framer.framedOut -> mkr1000_comm.send
+
+      mkr1000_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
+      mkr1000_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mkr1000_comm.$recv -> mkr1000_deframer.framedIn
       
-      arduino_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      arduino_framer.framedOut -> arduino_comm.send
-      arduino_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-    
-    # uplink
-      arduino_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      arduino_comm.$recv -> arduino_deframer.framedIn
-      
-      arduino_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      arduino_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      arduino_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      arduino_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
-      arduino_deframer.bufferOut -> arduino.bufferSendIn 
+      mkr1000_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      mkr1000_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mkr1000_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      mkr1000_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      mkr1000_deframer.bufferOut -> mkr1000.bufferSendIn 
     }
 
     connections Rpi3Camera {
@@ -193,6 +196,23 @@ module RPi4 {
       camera_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       camera_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
       camera_deframer.bufferOut -> camera.bufferSendIn 
+    }
+
+    connections Mega {
+      mega.PktSend -> mega_framer.comIn
+      mega_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mega_framer.framedOut -> mega_comm.send
+
+      mega_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
+      mega_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mega_comm.$recv -> mega_deframer.framedIn
+      
+      mega_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      mega_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mega_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      mega_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      mega_deframer.bufferOut -> mega.bufferSendIn 
+
     }
 
   }

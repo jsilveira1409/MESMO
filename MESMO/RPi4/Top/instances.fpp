@@ -87,21 +87,26 @@ module RPi4 {
     stack size Default.STACK_SIZE \
     priority 96
 
-  instance arduino: Components.ArduinoMega base id 0x0E00 \
+  instance mkr1000: Components.ArduinoMKR1000 base id 0x0E00 \
     queue size Default.QUEUE_SIZE \
     stack size Default.STACK_SIZE \
     priority 95
 
-  instance camera: Components.Camera base id 0x0F00 \
+  instance camera: Components.Camera base id 0x0E10 \
     queue size Default.QUEUE_SIZE \
     stack size Default.STACK_SIZE \
     priority 94
-
-  instance arduino_framer : Components.SubsystemFramer base id 0x1000 
-
-  instance arduino_deframer : Components.SubsystemDeframer base id 0x1001
   
-  instance arduino_comm: Drv.ByteStreamDriverModel base id 0x1002 type "Drv::LinuxUartDriver" at "../../Drv/LinuxUartDriver/LinuxUartDriver.hpp" 
+  instance mega : Components.ArduinoMega base id 0x0E20 \
+    queue size Default.QUEUE_SIZE \
+    stack size Default.STACK_SIZE \
+    priority 93
+
+  instance mkr1000_framer : Components.SubsystemFramer base id 0x1000 
+
+  instance mkr1000_deframer : Components.SubsystemDeframer base id 0x1001
+  
+  instance mkr1000_comm: Drv.ByteStreamDriverModel base id 0x1002 type "Drv::LinuxUartDriver" at "../../Drv/LinuxUartDriver/LinuxUartDriver.hpp" 
 
 
   instance camera_framer : Components.SubsystemFramer base id 0x1010
@@ -109,6 +114,12 @@ module RPi4 {
   instance camera_deframer : Components.SubsystemDeframer base id 0x1011
 
   instance camera_comm: Drv.ByteStreamDriverModel base id 0x1012 type "Drv::TcpClient" at "../../Drv/TcpClient/TcpClient.hpp"
+
+  instance mega_comm: Drv.LinuxUartDriver base id 0x1022
+
+  instance mega_framer : Components.SubsystemFramer base id 0x1020
+
+  instance mega_deframer : Components.SubsystemDeframer base id 0x1021
   
   ## subsystems Shares Ressources
     instance subsystemsFileUplink: Svc.FileUplink base id 0x1300 \

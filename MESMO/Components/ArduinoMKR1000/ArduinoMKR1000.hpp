@@ -1,18 +1,19 @@
 // ======================================================================
-// \title  ArduinoMega.hpp
+// \title  ArduinoMKR1000.hpp
 // \author jsilveira
-// \brief  hpp file for ArduinoMega component implementation class
+// \brief  hpp file for ArduinoMKR1000 component implementation class
 // ======================================================================
 
-#ifndef ArduinoMega_HPP
-#define ArduinoMega_HPP
+#ifndef ArduinoMKR1000_HPP
+#define ArduinoMKR1000_HPP
 
-#include "Components/ArduinoMega/ArduinoMegaComponentAc.hpp"
+#include "Components/ArduinoMKR1000/ArduinoMKR1000ComponentAc.hpp"
 
 namespace Components {
 
-  class ArduinoMega :
-    public ArduinoMegaComponentBase
+  // Component Implementation Class
+  class ArduinoMKR1000 :
+    public ArduinoMKR1000ComponentBase
   {
 
     public:
@@ -21,21 +22,29 @@ namespace Components {
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
 
-      //! Construct object ArduinoMega
+      //! Construct object ArduinoMKR1000
       //!
-      ArduinoMega(
+      ArduinoMKR1000(
           const char *const compName /*!< The component name*/
       );
 
-      //! Destroy object ArduinoMega
+      //! Destroy object ArduinoMKR1000
       //!
-      ~ArduinoMega();
+      ~ArduinoMKR1000();
 
     PRIVATE:
 
       // ----------------------------------------------------------------------
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
+
+      //! Handler implementation for PktRecv
+      //!
+      void PktRecv_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &recvBuffer, 
+          const Drv::RecvStatus &recvStatus 
+      );
 
       //! Handler implementation for Run
       //!
@@ -69,22 +78,12 @@ namespace Components {
           */
       );
 
-      //! Implementation for MoveServo command handler
+      //! Implementation for SendCommand command handler
       //! Command to send a defined command to the Payload
-      void MoveServo_cmdHandler(
+      void SendCommand_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq, /*!< The command sequence number*/
-          Components::ArduinoMega_MoveCommands cmd, 
-          U8 angle 
-      );
-
-      //! Implementation for ConfigureServoSpeed command handler
-      //! Command to send a defined command to the Payload
-      void ConfigureServoSpeed_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          Components::ArduinoMega_ConfigCommands cmd, 
-          U8 speed 
+          Components::ArduinoMKR1000_Commands payloadcommand 
       );
 
 
