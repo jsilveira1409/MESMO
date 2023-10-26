@@ -41,29 +41,15 @@ module Components {
         # General ports
         # -------------------------------------------------
 
-        @ Input Scheduler port 
         async input port Run: Svc.Sched
 
-        @ Output Com port for sending data to the Hardware payload
-        output port HwPktSend: Fw.Com
-
-        @ Output Com port for sending data to the Software payload
-        output port SwPktSend: Fw.Com
-
-        @ Input Byte port for receiving data from the payload
-        async input port PktRecv: Drv.ByteStreamRecv
-
-        @ deallocate
         output port deallocate : Fw.BufferSend
 
-        @ allocate
         output port allocate : Fw.BufferGet
 
-        @ input port 
-        async input port bufferSendIn : Fw.BufferSend
+        async input port bufferSendIn: Fw.BufferSend
 
-        @ file packet port
-        output port FilePktSend: Fw.BufferSend
+        output port PktSend : Fw.Com
 
 
         ###############################################################################

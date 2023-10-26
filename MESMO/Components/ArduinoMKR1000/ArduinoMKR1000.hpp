@@ -38,14 +38,6 @@ namespace Components {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
-      //! Handler implementation for PktRecv
-      //!
-      void PktRecv_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &recvBuffer, 
-          const Drv::RecvStatus &recvStatus 
-      );
-
       //! Handler implementation for Run
       //!
       void Run_handler(

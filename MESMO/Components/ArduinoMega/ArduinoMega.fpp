@@ -35,13 +35,10 @@ module Components {
         opcode 2
 
 
-         @ Input Scheduler port 
         async input port Run: Svc.Sched
 
-        @ deallocate
         output port deallocate : Fw.BufferSend
 
-        @ allocate
         output port allocate : Fw.BufferGet
 
         async input port bufferSendIn: Fw.BufferSend

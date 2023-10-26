@@ -131,6 +131,12 @@ void configureTopology() {
     subsystemsBuffMgrBins.bins[1].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
     subsystemsBuffMgrBins.bins[2].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
     subsystemsBuffMgrBins.bins[2].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[3].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[3].numBuffers = 20;
+    subsystemsBuffMgrBins.bins[4].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[4].numBuffers = 20;
+    subsystemsBuffMgrBins.bins[5].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[5].numBuffers = 20;
     subsystemsFileUplinkBufferManager.setup(SUBSYSTEMS_BUFFER_MANAGER_ID, 0, mallocator, subsystemsBuffMgrBins);
 
     // Framer and Deframer components need to be passed a protocol handler
@@ -174,16 +180,17 @@ void setupTopology(const TopologyState& state) {
         comDriver.configure(state.hostname, state.port);
         comDriver.startSocketTask(name, true, COMM_PRIORITY, Default::STACK_SIZE);
     }
-    bool com_open = mega_comm.open("/dev/ttyACM1", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_EVEN, 1024);
-
-    // configuring subsystems drivers
-    printf("com_open: %d\n", com_open);
+    bool mega_com_open = mega_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_EVEN, 1024);
+    printf("Arduino Mega Driver Open : %d\n", mega_com_open);
     mega_comm.startReadThread();
 
     Os::TaskString CameraTask("CameraTask");
     camera_comm.configure("0.0.0.0", 50001);
     camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
 
+    bool gps_com_open = gps_comm.open("/dev/ttyAMA1", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+    printf("GPS Driver Open : %d\n", gps_com_open);
+    gps_comm.startReadThread();
 
 }
 

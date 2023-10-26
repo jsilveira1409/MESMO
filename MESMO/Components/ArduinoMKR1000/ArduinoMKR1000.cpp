@@ -33,16 +33,6 @@ namespace Components {
   // ----------------------------------------------------------------------
 
   void ArduinoMKR1000 ::
-    PktRecv_handler(
-        const NATIVE_INT_TYPE portNum,
-        Fw::Buffer &recvBuffer,
-        const Drv::RecvStatus &recvStatus
-    )
-  {
-    // TODO
-  }
-
-  void ArduinoMKR1000 ::
     Run_handler(
         const NATIVE_INT_TYPE portNum,
         NATIVE_UINT_TYPE context
@@ -84,7 +74,7 @@ namespace Components {
     arg = Fw::ComBuffer(textPtr, size);
     //U32 size = arg.getBuffLength();
 
-    this->HwPktSend_out(0, arg, 0);
+    this->PktSend_out(0, arg, 0);
     this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
   }
 
@@ -104,7 +94,7 @@ namespace Components {
     
     Fw::ComBuffer arg(data, size);
     
-    this->HwPktSend_out(0, arg, 0);
+    this->PktSend_out(0, arg, 0);
     this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
   }
 

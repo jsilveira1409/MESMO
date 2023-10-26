@@ -78,7 +78,7 @@
         <channel name="systemResources.CPU_15"/>
     </packet>
 
-     <packet name="subsystems" id="8" level="2">
+    <packet name="subsystems" id="8" level="2">
         <channel name="subsystemsFileUplink.PacketsReceived"/>
         <channel name="subsystemsFileUplink.Warnings"/>
         <channel name="subsystemsFileUplink.FilesReceived"/>
@@ -95,7 +95,16 @@
         <channel name="subsystemsFileUplinkBufferManager.NoBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.EmptyBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.TotalBuffs"/>
+
+        <channel name="gps.Longitude"/>
+        <channel name="gps.Latitude"/>
+        <channel name="gps.Altitude"/>
+        <channel name="gps.GpsCount"/>
+        <channel name="gps_comm.BytesSent"/>
+        <channel name="gps_comm.BytesRecv"/>
     </packet>
+
+
 
     <!-- Ignored packets -->
 

@@ -63,6 +63,9 @@ module RPi4 {
     instance subsystemsStaticMemory
     instance subsystemsFileUplink
 
+    instance gps
+    instance gps_comm
+
     # ----------------------------------------------------------------------
     # Pattern graph specifiers
     # ----------------------------------------------------------------------
@@ -163,8 +166,8 @@ module RPi4 {
     }
 
     connections MKR1000 {
-    # downlink  
-      mkr1000.HwPktSend -> mkr1000_framer.comIn
+      mkr1000.PktSend -> mkr1000_framer.comIn
+
       mkr1000_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       mkr1000_framer.framedOut -> mkr1000_comm.send
 
@@ -179,15 +182,13 @@ module RPi4 {
       mkr1000_deframer.bufferOut -> mkr1000.bufferSendIn 
     }
 
-    connections Rpi3Camera {
-    # downlink  
+    connections Rpi4Camera {
       camera.HwPktSend -> camera_framer.comIn
       
       camera_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       camera_framer.framedOut -> camera_comm.send
+
       camera_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-    
-    # uplink
       camera_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       camera_comm.$recv -> camera_deframer.framedIn
       
@@ -200,6 +201,7 @@ module RPi4 {
 
     connections Mega {
       mega.PktSend -> mega_framer.comIn
+      
       mega_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       mega_framer.framedOut -> mega_comm.send
 
@@ -214,6 +216,18 @@ module RPi4 {
       mega_deframer.bufferOut -> mega.bufferSendIn 
 
     }
+
+     connections GPS {
+      gps.send -> gps_comm.send 
+      gps.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      gps.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      gps_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      gps_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      gps_comm.$recv -> gps.$recv
+      gps_comm.ready -> gps.ready
+
+
+     }
 
   }
 
