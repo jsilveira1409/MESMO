@@ -180,18 +180,41 @@ void setupTopology(const TopologyState& state) {
         comDriver.configure(state.hostname, state.port);
         comDriver.startSocketTask(name, true, COMM_PRIORITY, Default::STACK_SIZE);
     }
-    bool mega_com_open = mega_comm.open("/dev/ttyACM0", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_EVEN, 1024);
-    printf("Arduino Mega Driver Open : %d\n", mega_com_open);
-    mega_comm.startReadThread();
-
+    // Mega
+    if (state.megaComm == nullptr) {
+        printf("Mega Comm is null\n");
+    }else{
+        bool mega_com_open = mega_comm.open(state.megaComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
+        printf("Arduino Mega Driver Open : %d\n", mega_com_open);
+        mega_comm.startReadThread();
+    }
+    
+    //On board Camera
     Os::TaskString CameraTask("CameraTask");
     camera_comm.configure("0.0.0.0", 50001);
     camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
 
-    bool gps_com_open = gps_comm.open("/dev/ttyAMA1", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
-    printf("GPS Driver Open : %d\n", gps_com_open);
-    gps_comm.startReadThread();
+    //GPS
+    if (state.gpsComm == nullptr) {
+        printf("GPS Comm is null. Defaulting to AMA1\n");
+        bool gps_com_open = gps_comm.open("/dev/ttyAMA1", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+        printf("GPS Driver Open : %d\n", gps_com_open);
+        gps_comm.startReadThread();
+    }else{
+        bool gps_com_open = gps_comm.open(state.gpsComm, Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+        printf("GPS Driver Open : %d\n", gps_com_open);
+        gps_comm.startReadThread();
+    }
 
+    //Nano
+    if (state.nanoComm == nullptr) {
+        printf("Nano Comm is null\n");
+    }else{
+        bool nano_com_open = nano_comm.open(state.nanoComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+        printf("Arduino Nano Driver Open : %d\n", nano_com_open);
+        nano_comm.startReadThread();
+    }
+    
 }
 
 // Variables used for cycle simulation

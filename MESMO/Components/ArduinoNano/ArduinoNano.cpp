@@ -1,11 +1,11 @@
 // ======================================================================
-// \title  ArduinoMKR1000.cpp
+// \title  ArduinoNano.cpp
 // \author jsilveira
-// \brief  cpp file for ArduinoMKR1000 component implementation class
+// \brief  cpp file for ArduinoNano component implementation class
 // ======================================================================
 
 
-#include <Components/ArduinoMKR1000/ArduinoMKR1000.hpp>
+#include <Components/ArduinoNano/ArduinoNano.hpp>
 #include <FpConfig.hpp>
 
 namespace Components {
@@ -14,16 +14,16 @@ namespace Components {
   // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
-  ArduinoMKR1000 ::
-    ArduinoMKR1000(
+  ArduinoNano ::
+    ArduinoNano(
         const char *const compName
-    ) : ArduinoMKR1000ComponentBase(compName)
+    ) : ArduinoNanoComponentBase(compName)
   {
 
   }
 
-  ArduinoMKR1000 ::
-    ~ArduinoMKR1000()
+  ArduinoNano ::
+    ~ArduinoNano()
   {
 
   }
@@ -32,7 +32,7 @@ namespace Components {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void ArduinoMKR1000 ::
+  void ArduinoNano ::
     Run_handler(
         const NATIVE_INT_TYPE portNum,
         NATIVE_UINT_TYPE context
@@ -41,27 +41,21 @@ namespace Components {
     // TODO
   }
 
-  void ArduinoMKR1000 ::
+  void ArduinoNano ::
     bufferSendIn_handler(
         const NATIVE_INT_TYPE portNum,
         Fw::Buffer &fwBuffer
     )
   {
-    // here we transform the buffer data into the sensor telemetry
     const U8* data = fwBuffer.getData();
-    //print data
-    this->tlmWrite_LED1State((bool)data[0]);
-    this->tlmWrite_LED2State((bool)data[1]);
-    this->tlmWrite_LED3State((bool)data[2]);
-    this->tlmWrite_pirState((bool)data[3]);
-    this->tlmWrite_ldrVal((U16)(data[4] << 8 | data[5]));
+
   }
 
   // ----------------------------------------------------------------------
   // Command handler implementations
   // ----------------------------------------------------------------------
 
-  void ArduinoMKR1000 ::
+  void ArduinoNano ::
     SendString_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq,
@@ -77,12 +71,13 @@ namespace Components {
     this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
   }
 
-  void ArduinoMKR1000 ::
+  void ArduinoNano ::
     SendCommand_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq,
-        Components::ArduinoMKR1000_Commands payloadcommand
-    ){
+        Components::ArduinoNano_Commands payloadcommand
+    )
+  {
     const U32 size = sizeof(payloadcommand.e);
     U8 data[size];
     data[0] = (U8) (payloadcommand.e >> 24);
@@ -90,6 +85,7 @@ namespace Components {
     data[2] = (U8) (payloadcommand.e >> 8);
     data[3] = (U8) payloadcommand.e;
 
+    
     Fw::ComBuffer arg(data, size);
     
     this->PktSend_out(0, arg, 0);
@@ -97,4 +93,3 @@ namespace Components {
   }
 
 } // end namespace Components
-

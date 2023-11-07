@@ -8,7 +8,6 @@ import cv2
 
 
 
-
 cmds = {
     "TakePicture":     b'\x00\x00\x00\x01',
     "SendPicture":    b'\x00\x00\x00\x02',
@@ -19,7 +18,9 @@ cmds = {
 current_cmd = cmds["NONE"]
 img_data = None
 camera = cv2.VideoCapture(0)
+camera.rotate = 180
 #ret, buf = cv2.imencode('.jpg', frame)  
+
 def decode_cmd(data):
     global img, img_data, cmds, take_picture, video_capture
     return_data = None
@@ -71,6 +72,7 @@ def runTCP():
             print(f'Connection address: {addr} \n')
             while True:                
                 start_frame = conn.recv(4)
+                print(f"Received {start_frame}")
                 if start_frame == b'\xde\xad\xbe\xef':
                     data_lentgh = conn.recv(4)
                     data = conn.recv(int.from_bytes(data_lentgh, "big"))

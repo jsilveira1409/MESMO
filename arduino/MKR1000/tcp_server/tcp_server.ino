@@ -1,148 +1,135 @@
-#include <WiFi101.h>
-#include <WiFiClient.h>
-#include <WiFiServer.h>
-#include <WiFiSSLClient.h>
-#include <WiFiUdp.h>
+/*
+  WiFi Web Server
+
+ A simple web server that shows the value of the analog input pins.
+ using a WiFi shield.
+
+ This example is written for a network using WPA encryption. For
+ WEP or WPA, change the WiFi.begin() call accordingly.
+
+ Circuit:
+ * WiFi shield attached
+ * Analog inputs attached to pins A0 through A5 (optional)
+
+ created 13 July 2010
+ by dlf (Metodo2 srl)
+ modified 31 May 2012
+ by Tom Igoe
+
+ */
 
 #include <SPI.h>
 #include <WiFi101.h>
- 
-char ssid[] = "Jojo";       //  your network SSID (name)
-char pass[] = "legrandinquisiteur";   // your network password
-int ledpin = 6;           //The built in LED pin on the MKR1000
-const int led1 = 0;
-const int led2 = 1;
-const int led3 = 2;
-const int led4 = 3;
 
-const int ledPins[] = {led1, led2, led3, led4};
-const int numLeds = sizeof(ledPins) / sizeof(ledPins[0]);
+
+#include "arduino_secrets.h" 
+///////please enter your sensitive data in the Secret tab/arduino_secrets.h
+char ssid[] = SECRET_SSID;        // your network SSID (name)
+char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
+int keyIndex = 0;                 // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
+
 WiFiServer server(80);
- 
-enum cmds {
-  TOGGLE_LED1 = 0x01,
-  TOGGLE_LED2 = 0x02,
-  TOGGLE_LED3 = 0x03,
-  TOGGLE_LED4 = 0x04,
-  SEND_STATUS = 0x05
-};
 
 void setup() {
-  Serial.begin(9600);      // initialize serial communication
-  Serial.print("Start Serial ");
-  pinMode(ledpin, OUTPUT);      // set the LED pin mode
-  pinMode(led1, OUTPUT);      // set the LED pin mode
-  pinMode(led2, OUTPUT);      // set the LED pin mode
-  pinMode(led3, OUTPUT);      // set the LED pin mode
-  pinMode(led4, OUTPUT);      // set the LED pin mode
-
-  // Check for the presence of the shield
-  Serial.print("WiFi101 shield: ");
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("NOT PRESENT");
-    return; // don't continue
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
   }
-  Serial.println("DETECTED");
-  // attempt to connect to Wifi network:
+
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present");
+    // don't continue:
+    while (true);
+  }
+
+  // attempt to connect to WiFi network:
   while (status != WL_CONNECTED) {
-    digitalWrite(ledpin, LOW);
-    Serial.print("Attempting to connect to Network named: ");
-    Serial.println(ssid);                   // print the network name (SSID);
-    digitalWrite(ledpin, HIGH);
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
     // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
     status = WiFi.begin(ssid, pass);
+
     // wait 10 seconds for connection:
     delay(10000);
   }
-  server.begin();                           // start the web server on port 80
-  digitalWrite(ledpin, HIGH);
+  server.begin();
+  // you're connected now, so print out the status:
+  printWiFiStatus();
 }
 
+
 void loop() {
-  WiFiClient client = server.available();   // listen for incoming clients
-  
-  if (client) {            // check if a client is connected
-    Serial.println("new client");           // print a message out the serial port
-    
-    // Keep the connection open until the client disconnects or there's no data for a timeout duration
-    unsigned long lastDataTime = millis();
-    const unsigned long timeoutDuration = 5000;  // 5 seconds timeout
-
-    while (client.connected() && (millis() - lastDataTime < timeoutDuration)) {
+  // listen for incoming clients
+  WiFiClient client = server.available();
+  if (client) {
+    Serial.println("new client");
+    // an http request ends with a blank line
+    bool currentLineIsBlank = true;
+    while (client.connected()) {
       if (client.available()) {
-        lastDataTime = millis();  // Update the last data time
-
-        char c = client.read();             // read a byte
-        Serial.print(c, HEX);               // print it out in hexadecimal format
-
-        cmds command = static_cast<cmds>(c);  // Cast the received char to the enum type
-        switch (command) {
-          case TOGGLE_LED1:
-              Serial.println("Led1");
-              digitalWrite(led1, !digitalRead(led1));  // Toggle LED1
-              break;
-          case TOGGLE_LED2:
-              Serial.println("Led2");
-              digitalWrite(led2, !digitalRead(led2));  // Toggle LED2
-              break;
-          case TOGGLE_LED3:
-              Serial.println("Led3"); 
-              digitalWrite(led3, !digitalRead(led3));  // Toggle LED3
-              break;
-          case TOGGLE_LED4:
-              Serial.println("Led4");
-              digitalWrite(led4, !digitalRead(led4));  // Toggle LED4
-              break;
-          case SEND_STATUS:
-              // Handle SEND_STATUS command
-              client.write("Doing Great!");
-              // For example, you can send back the status of the LEDs or any other information
-              break;
-          default:
-              Serial.println("Unknown command received.");
-              Serial.println();
-              break;
+        char c = client.read();
+        Serial.write(c);
+        // if you've gotten to the end of the line (received a newline
+        // character) and the line is blank, the http request has ended,
+        // so you can send a reply
+        if (c == '\n' && currentLineIsBlank) {
+          // send a standard http response header
+          client.println("HTTP/1.1 200 OK");
+          client.println("Content-Type: text/html");
+          client.println("Connection: close");  // the connection will be closed after completion of the response
+          client.println("Refresh: 5");  // refresh the page automatically every 5 sec
+          client.println();
+          client.println("<!DOCTYPE HTML>");
+          client.println("<html>");
+          // output the value of each analog input pin
+          for (int analogChannel = 0; analogChannel < 6; analogChannel++) {
+            int sensorReading = analogRead(analogChannel);
+            client.print("analog input ");
+            client.print(analogChannel);
+            client.print(" is ");
+            client.print(sensorReading);
+            client.println("<br />");
+          }
+          client.println("</html>");
+          break;
+        }
+        if (c == '\n') {
+          // you're starting a new line
+          currentLineIsBlank = true;
+        }
+        else if (c != '\r') {
+          // you've gotten a character on the current line
+          currentLineIsBlank = false;
+        }
       }
     }
+    // give the web browser time to receive the data
+    delay(1);
+
     // close the connection:
     client.stop();
     Serial.println("client disconnected");
-    }
-    chasePattern();
   }
 }
 
-void printWifiStatus() {
+
+void printWiFiStatus() {
   // print the SSID of the network you're attached to:
   Serial.print("SSID: ");
   Serial.println(WiFi.SSID());
- 
+
   // print your WiFi shield's IP address:
   IPAddress ip = WiFi.localIP();
   Serial.print("IP Address: ");
   Serial.println(ip);
- 
+
   // print the received signal strength:
   long rssi = WiFi.RSSI();
   Serial.print("signal strength (RSSI):");
   Serial.print(rssi);
   Serial.println(" dBm");
-  // print where to go in a browser:
-  Serial.print("To see this page in action, open a browser to http://");
-  Serial.println(ip);
-}
-
-void chasePattern() {
-  for (int i = 0; i < numLeds; i++) {
-    digitalWrite(ledPins[i], HIGH);  // Turn on the current LED
-    delay(100);                      // Wait for 200ms
-    digitalWrite(ledPins[i], LOW);   // Turn off the current LED
-
-    // If it's the last LED in the sequence, delay a bit longer before restarting the pattern
-    if (i == numLeds - 1) {
-      delay(250);
-    }
-  }
 }

@@ -102,6 +102,12 @@
         <channel name="gps.GpsCount"/>
         <channel name="gps_comm.BytesSent"/>
         <channel name="gps_comm.BytesRecv"/>
+        
+        <channel name="nano_comm.BytesRecv"/>
+        <channel name="nano_comm.BytesSent"/>
+        <channel name="nano.ldrVal"/>
+        <channel name="nano.ledPattern"/>
+        
     </packet>
 
 

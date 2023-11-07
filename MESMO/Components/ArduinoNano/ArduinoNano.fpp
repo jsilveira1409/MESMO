@@ -1,24 +1,12 @@
 module Components {
     @ Component for F Prime FSW framework.
-    active component ArduinoMega {
-        
-        enum MoveCommands{
-            SERVO_SHOULDER_SET = 0x01
-            SERVO_ELBOW_SET = 0x02
-            SERVO_FOREARM_SET = 0x03
-            SERVO_WRIST_SET = 0x04
-            SERVO_SHOULDER_SWEEP = 0x05
-            SERVO_ELBOW_SWEEP = 0x06
-            SERVO_FOREARM_SWEEP = 0x07
-            SERVO_WRIST_SWEEP = 0x08
-        }
+    active component ArduinoNano {
 
-        enum ConfigCommands{
-            SERVO_SHOULDER_SPEED = 0x09
-            SERVO_ELBOW_SPEED = 0x0A
-            SERVO_FOREARM_SPEED = 0x0B
-            SERVO_WRIST_SPEED = 0x0C
-            
+        enum Commands{
+            LED_PATTERN_1 = 0x01
+            LED_PATTERN_2 = 0x02
+            LED_PATTERN_3 = 0x03
+            READ_LDR = 0x04
         }
         
         @ Command to send a string to the Payload
@@ -28,19 +16,27 @@ module Components {
         opcode 0
 
         @ Command to send a defined command to the Payload
-        async command MoveServo (
-                                    cmd : MoveCommands, 
-                                    angle : U8
+        async command SendCommand (
+                                    payloadcommand : Commands
                                 ) \
         opcode 1
 
-        @ Command to send a defined command to the Payload
-        async command ConfigureServoSpeed (
-                                    cmd : ConfigCommands, 
-                                    speed : U8        
-                                ) \
-        opcode 2
+        ##############################################################################
+        #### Uncomment the following examples to start customizing your component ####
+        ##############################################################################
 
+        # @ Example telemetry counter
+        telemetry ldrVal : U16
+        telemetry ledPattern : U8
+
+        
+
+        # @ Example port: receiving calls from the rate group
+        # sync input port run: Svc.Sched
+
+        # -------------------------------------------------
+        # General ports
+        # -------------------------------------------------
 
         async input port Run: Svc.Sched
 
@@ -52,7 +48,6 @@ module Components {
 
         output port PktSend : Fw.Com
 
-        
         ###############################################################################
         # Standard AC Ports: Required for Channels, Events, Commands, and Parameters  #
         ###############################################################################

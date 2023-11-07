@@ -104,6 +104,11 @@ module RPi4 {
 
   instance gps : Components.Gps base id 0x0E30 
 
+  instance nano : Components.ArduinoNano base id 0x0E40 \
+    queue size Default.QUEUE_SIZE \
+    stack size Default.STACK_SIZE \
+    priority 92
+
   
   instance mkr1000_framer : Components.SubsystemFramer base id 0x1000 
   instance mkr1000_deframer : Components.SubsystemDeframer base id 0x1001
@@ -113,12 +118,16 @@ module RPi4 {
   instance camera_deframer : Components.SubsystemDeframer base id 0x1011
   instance camera_comm: Drv.ByteStreamDriverModel base id 0x1012 type "Drv::TcpClient" at "../../Drv/TcpClient/TcpClient.hpp"
 
-
   instance mega_comm: Drv.LinuxUartDriver base id 0x1022
   instance mega_framer : Components.SubsystemFramer base id 0x1020
   instance mega_deframer : Components.SubsystemDeframer base id 0x1021
 
   instance gps_comm: Drv.LinuxUartDriver base id 0x1030
+
+  instance nano_comm: Drv.LinuxUartDriver base id 0x1040
+  instance nano_framer : Components.SubsystemFramer base id 0x1050
+  instance nano_deframer : Components.SubsystemDeframer base id 0x1060
+
   
   ## subsystems Shares Ressources
     instance subsystemsFileUplink: Svc.FileUplink base id 0x1300 \

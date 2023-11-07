@@ -48,10 +48,14 @@ static void signalHandler(int signum) {
 int main(int argc, char* argv[]) {
     I32 option = 0;
     CHAR* hostname = nullptr;
+    CHAR* nanoComm = nullptr;
+    CHAR* megaComm = nullptr;
+    CHAR* gpsComm = nullptr;
     U16 port_number = 0;
 
     // Loop while reading the getopt supplied options
-    while ((option = getopt(argc, argv, "hp:a:")) != -1) {
+    while ((option = getopt(argc, argv, "hp:a:m:n:g:")) != -1) {
+        printf("optarg: %s\n", optarg);
         switch (option) {
             // Handle the -a argument for address/hostname
             case 'a':
@@ -60,6 +64,15 @@ int main(int argc, char* argv[]) {
             // Handle the -p port number argument
             case 'p':
                 port_number = static_cast<U16>(atoi(optarg));
+                break;
+            case 'n':
+                nanoComm = optarg;
+                break;
+            case 'm':
+                megaComm = optarg;
+                break;
+            case 'g':
+                gpsComm = optarg;
                 break;
             // Cascade intended: help output
             case 'h':
@@ -75,7 +88,10 @@ int main(int argc, char* argv[]) {
     RPi4::TopologyState inputs;
     inputs.hostname = hostname;
     inputs.port = port_number;
-
+    inputs.nanoComm = nanoComm;
+    inputs.megaComm = megaComm;
+    inputs.gpsComm = gpsComm;
+    printf("input.nanoComm: %s\n", inputs.nanoComm);
     // Setup program shutdown via Ctrl-C
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);

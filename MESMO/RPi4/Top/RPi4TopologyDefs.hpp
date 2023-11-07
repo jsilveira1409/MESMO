@@ -25,6 +25,9 @@ namespace RPi4 {
 struct TopologyState {
     const CHAR* hostname;
     U16 port;
+    const CHAR* nanoComm;
+    const CHAR* megaComm;
+    const CHAR* gpsComm;
 };
 
 /**

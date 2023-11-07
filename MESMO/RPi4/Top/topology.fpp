@@ -41,6 +41,11 @@ module RPi4 {
     instance rateGroupDriver
     instance textLogger
     instance systemResources
+    
+    # custom components shared components
+    instance subsystemsFileUplinkBufferManager
+    instance subsystemsStaticMemory
+    instance subsystemsFileUplink
 
     # custom components
     instance mkr1000
@@ -58,13 +63,13 @@ module RPi4 {
     instance mega_deframer
     instance mega_framer
 
-    # custom components shared components
-    instance subsystemsFileUplinkBufferManager
-    instance subsystemsStaticMemory
-    instance subsystemsFileUplink
-
     instance gps
     instance gps_comm
+
+    instance nano
+    instance nano_comm
+    instance nano_deframer
+    instance nano_framer
 
     # ----------------------------------------------------------------------
     # Pattern graph specifiers
@@ -225,7 +230,23 @@ module RPi4 {
       gps_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       gps_comm.$recv -> gps.$recv
       gps_comm.ready -> gps.ready
+     }
 
+     connections Nano{
+      nano.PktSend -> nano_framer.comIn
+      
+      nano_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      nano_framer.framedOut -> nano_comm.send
+
+      nano_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
+      nano_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      nano_comm.$recv -> nano_deframer.framedIn
+      
+      nano_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      nano_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      nano_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      nano_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      nano_deframer.bufferOut -> nano.bufferSendIn 
 
      }
 
