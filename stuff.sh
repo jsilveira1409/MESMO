@@ -1,0 +1,1 @@
+sudo ./RPi4 -a 192.168.1.247 -p 50000 -m /dev/ttyACM1 -g /dev/ttyAMA0 -n /dev/ttyACM0

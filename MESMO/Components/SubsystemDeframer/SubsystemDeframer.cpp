@@ -25,7 +25,6 @@ namespace Components {
         this->m_expectedSize = 0;
         this->m_receivedSize = 0;
         this->m_pktIndex = 0;
-
   }
 
   SubsystemDeframer ::
@@ -179,7 +178,7 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
 }
 
 void SubsystemDeframer ::sendStartPacket(){
-  printf("send start packet\n");
+  printf("send start packet of size %d\n", this->m_expectedSize);
   Fw::FilePacket::StartPacket startPacket;
   char source[10];  // Ensure this buffer is large enough
   sprintf(source, "source%d", this->m_fileIndex);

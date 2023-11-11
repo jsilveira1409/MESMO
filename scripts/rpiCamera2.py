@@ -1,57 +1,41 @@
 import socket
-import time
-import struct
-import socket
 import struct
 import time
-import cv2
-
-
+import io
+import picamera
 
 cmds = {
     "TakePicture":     b'\x00\x00\x00\x01',
-    "SendPicture":    b'\x00\x00\x00\x02',
-    "SendStatus":     b'\x00\x00\x00\x03',
-    "NONE":             b'\x00\x00\x00\x99'
+    "SendPicture":     b'\x00\x00\x00\x02',
+    "SendStatus":      b'\x00\x00\x00\x03',
+    "NONE":            b'\x00\x00\x00\x99'
 }
 
-current_cmd = cmds["NONE"]
-img_data = None
-camera = cv2.VideoCapture(0)
-camera.rotate = 180
-#ret, buf = cv2.imencode('.jpg', frame)  
+camera = picamera.PiCamera()
+camera.rotation = 180
 
-def decode_cmd(data):
-    global img, img_data, cmds, take_picture, video_capture
-    return_data = None
+def decode_cmd(data, conn):
     if data == cmds["SendPicture"]:
         print("Sending Picture")
-        ret, frame = camera.read()
-        if not ret:
-            print("Failed to read image")
-            return_data = b''
-        else:
-            # Encode the image to JPEG format
-            #ret, jpeg_data = cv2.imencode('.jpg', cv2.resize(frame, (480, 270)))
-            ret, jpeg_data = cv2.imencode('.jpg', frame)
-            if not ret:
-                print("Failed to encode image")
-                return_data = b''
-            else:
-                return_data = jpeg_data.tobytes()  # Convert the NumPy array to bytes
+        stream = io.BytesIO()
+        camera.capture(stream, format='jpeg')
+        stream.seek(0)  # Go to the start of the stream
+        return_data = stream.read()
+        stream.close()
     elif data == cmds["TakePicture"]:
         print("Taking Picture")
-        return_data = "Taking Picture"
-        return_data = return_data.encode()
+        return_data = "Taking Picture".encode()
         print("Picture taken")
     elif data == cmds["SendStatus"]:
         print("Sending Current Status")
-        return_data = "Payload Status: Doing great"
-        return_data = return_data.encode()
+        return_data = "Payload Status: Doing great".encode()
     
-    return return_data
-
-
+    # Send the data with header and size
+    if return_data:
+        data = b'\xde\xad\xbe\xef' + struct.pack('>I', len(return_data)) + return_data
+        conn.send(data)
+    else:
+        conn.send(b'\xde\xad\xbe\xef' + struct.pack('>I', 0))
 
 def runTCP():
     print("Starting TCP Server")
@@ -65,28 +49,21 @@ def runTCP():
     s.bind((TCP_IP, TCP_PORT))
     s.listen(1)
 
-    while 1:
-        print("Waiting connexion")
+    while True:
+        print("Waiting for connection")
         conn, addr = s.accept()
         try:
-            print(f'Connection address: {addr} \n')
+            print(f'Connection address: {addr}')
             while True:                
                 start_frame = conn.recv(4)
-                print(f"Received {start_frame}")
                 if start_frame == b'\xde\xad\xbe\xef':
-                    data_lentgh = conn.recv(4)
-                    data = conn.recv(int.from_bytes(data_lentgh, "big"))
+                    data_length = conn.recv(4)
+                    data = conn.recv(int.from_bytes(data_length, "big"))
                     print(f"Received {data}")
-                    return_data = decode_cmd(data)
-                    if return_data is None:
-                        return_data = b''
-                    data = b'\xde\xad\xbe\xef' + struct.pack('>I', len(return_data)) + return_data
-                    print(f"Sending {len(return_data)}")
-                    conn.send(data)         
+                    decode_cmd(data, conn)
         finally:
             conn.close()
             print("Connection closed")
-        
 
 if __name__ == "__main__":
     runTCP()
