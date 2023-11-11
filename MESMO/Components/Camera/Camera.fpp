@@ -2,7 +2,6 @@ module Components {
     @ Component for F Prime FSW framework.
     active component Camera {
         enum Commands {
-            TAKE_PICTURE = 0x01
             SEND_PICTURE = 0x02
             SEND_STATUS  = 0x03
             NONE = 0x99            

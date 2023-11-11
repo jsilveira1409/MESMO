@@ -78,13 +78,9 @@ namespace Components {
         Components::ArduinoNano_Commands payloadcommand
     )
   {
-    const U32 size = sizeof(payloadcommand.e);
-    U8 data[size];
-    data[0] = (U8) (payloadcommand.e >> 24);
-    data[1] = (U8) (payloadcommand.e >> 16);
-    data[2] = (U8) (payloadcommand.e >> 8);
-    data[3] = (U8) payloadcommand.e;
-
+    const U32 size = 2;
+    printf("Command: %x\n", payloadcommand.e);
+    U8 data[size] = {0x00, payloadcommand.e};
     
     Fw::ComBuffer arg(data, size);
     

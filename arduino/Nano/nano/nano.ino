@@ -24,6 +24,9 @@ void setup() {
   }
   Serial.begin(115200); // opens serial port, sets data rate to 9600 bps
   Serial.println("Starting System");
+  pattern1();
+  pattern2();
+  pattern3();
 }
            
 
@@ -35,10 +38,9 @@ void loop() {
       int servo = 0; // for incoming serial data
       int data = 0;
       bytesRead = Serial.readBytes(buffer, 10);  // Read 8 bytes into buffer
-      // first byte in message chooses which servo to set to the specified angle
-      cmd = buffer[8];
-      // second byte in message sets the angle to set it to
-      data = buffer[9];
+      cmd = buffer[9];
+
+      data = buffer[8];
 
       switch(cmd){
         case LED_PATTERN_1:

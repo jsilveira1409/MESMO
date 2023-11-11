@@ -79,7 +79,7 @@ namespace Components {
         U8 angle
     )
   {
-    const U32 size =2;
+    const U32 size = 2;
     U8 data[2] = {cmd.e, angle};
     Fw::ComBuffer arg(data, size);
     
