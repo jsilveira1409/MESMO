@@ -24,4 +24,9 @@ void requestEvent() {
   int analogValue = analogRead(analogPin);
   Wire.write(lowByte(analogValue));  // Send low byte
   Wire.write(highByte(analogValue));  // Send low byte
+  Serial.println(analogValue);
+  float dist = 29988 * pow(analogValue, -1.173);
+  Serial.print("  ");
+  Serial.println(dist);
+  
 }

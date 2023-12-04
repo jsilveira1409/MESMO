@@ -167,9 +167,6 @@ module RPi4 {
     }
 
     connections SubsystemsSharedRessources {
-      
-      #mkr1000.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      #mkr1000.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       subsystemsFileUplink.bufferSendOut -> subsystemsFileUplinkBufferManager.bufferSendIn
     }
 
@@ -231,11 +228,9 @@ module RPi4 {
       nano.send -> nano_comm.send 
       nano.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       nano.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      #nano_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       nano_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
       nano_comm.$recv -> nano.$recv
       nano_comm.ready -> nano.ready
-
     }
 
 

@@ -45,9 +45,8 @@ namespace Components {
     
     this->read_out(0, 0x08, buffer);
     
-    U16 value = (data[0] << 8) | data[1];
-    F32 voltage = value * 0.0048828125;
-    F32 distance = 65 * pow(voltage, -1.10);
+    U16 value = (data[1] << 8) | data[0];
+    F32 distance = 29988 * pow(value, -1.173);
 
     this->tlmWrite_Distance(distance);
     this->tlmWrite_IRSensor(value);
