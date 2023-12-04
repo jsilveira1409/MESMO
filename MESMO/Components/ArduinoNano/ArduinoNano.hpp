@@ -37,20 +37,18 @@ namespace Components {
       // Handler implementations for user-defined typed input ports
       // ----------------------------------------------------------------------
 
-      //! Handler implementation for Run
+      //! Handler implementation for ready
       //!
-      void Run_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          NATIVE_UINT_TYPE context /*!< 
-      The call order
-      */
+      void ready_handler(
+          const NATIVE_INT_TYPE portNum /*!< The port number*/
       );
 
-      //! Handler implementation for bufferSendIn
+      //! Handler implementation for recv
       //!
-      void bufferSendIn_handler(
+      void recv_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &fwBuffer 
+          Fw::Buffer &recvBuffer, 
+          const Drv::RecvStatus &recvStatus 
       );
 
     PRIVATE:
@@ -58,16 +56,6 @@ namespace Components {
       // ----------------------------------------------------------------------
       // Command handler implementations
       // ----------------------------------------------------------------------
-
-      //! Implementation for SendString command handler
-      //! Command to send a string to the Payload
-      void SendString_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          const Fw::CmdStringArg& text /*!< 
-          String to send
-          */
-      );
 
       //! Implementation for SendCommand command handler
       //! Command to send a defined command to the Payload

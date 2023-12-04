@@ -155,6 +155,7 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
                   return;
               }
               data.setData(bufferData + 8);
+              data.setSize(size);
               this->bufferOut_out(0, data);
               
               sendEndPacket();
@@ -178,7 +179,7 @@ void SubsystemDeframer ::processBuffer(Fw::Buffer& buffer) {
 }
 
 void SubsystemDeframer ::sendStartPacket(){
-  printf("send start packet of size %d\n", this->m_expectedSize);
+  //printf("send start packet of size %d\n", this->m_expectedSize);
   Fw::FilePacket::StartPacket startPacket;
   char source[10];  // Ensure this buffer is large enough
   sprintf(source, "source%d", this->m_fileIndex);
@@ -199,7 +200,7 @@ void SubsystemDeframer ::sendStartPacket(){
 }
 
 void SubsystemDeframer ::sendDataPacket(U8 *const bufferData, const U32 bufferSize){
-  printf("send data packet nb %d\n", this->m_pktIndex);
+  //printf("send data packet nb %d\n", this->m_pktIndex);
   Fw::FilePacket::DataPacket dataPacket;
   dataPacket.initialize(this->m_pktIndex, this->m_receivedSize, bufferSize, bufferData);
   filePacket.fromDataPacket(dataPacket);
@@ -216,7 +217,7 @@ void SubsystemDeframer ::sendDataPacket(U8 *const bufferData, const U32 bufferSi
 }
 
 void SubsystemDeframer ::sendEndPacket(){
-    printf("send end packet\n");
+  //printf("send end packet\n");
   Fw::FilePacket::EndPacket endPacket;
   U32 checksum = 0; // TODO calculate checksum
   endPacket.initialize(this->m_pktIndex, checksum);

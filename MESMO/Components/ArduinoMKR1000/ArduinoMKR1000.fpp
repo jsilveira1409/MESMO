@@ -1,37 +1,14 @@
 module Components {
     @ Perovskia Cells payload, which reads voltage and current values of the solar cells
-    active component ArduinoMKR1000 {
-        enum Commands{
-            TOGGLE_LED1 = 0x01
-            TOGGLE_LED2 = 0x02
-            TOGGLE_LED3  = 0x03
-            SEND_TELEMETRY = 0x04
-            STOP_TELEMETRY = 0x05
-        }
-        
-        @ Command to send a string to the Payload
-        async command SendString(
-                                    $text: string size 40 @< String to send
-                                ) \
-        opcode 0
-
-        @ Command to send a defined command to the Payload
-        async command SendCommand (
-                                    payloadcommand : Commands
-                                ) \
-        opcode 1
+    passive component ArduinoMKR1000 {
 
         ##############################################################################
         #### Uncomment the following examples to start customizing your component ####
         ##############################################################################
 
         # @ Example telemetry counter
-        telemetry ldrVal : U16
-        telemetry pirState : bool
-        telemetry LED1State : bool
-        telemetry LED2State : bool
-        telemetry LED3State : bool
-
+        telemetry IRSensor : U16
+        telemetry Distance : F32
         
 
         # @ Example port: receiving calls from the rate group
@@ -41,15 +18,17 @@ module Components {
         # General ports
         # -------------------------------------------------
 
-        async input port Run: Svc.Sched
+        sync input port Run: Svc.Sched
 
         output port deallocate : Fw.BufferSend
 
         output port allocate : Fw.BufferGet
 
-        async input port bufferSendIn: Fw.BufferSend
-
-        output port PktSend : Fw.Com
+        output port write: Drv.I2c
+        
+        output port read: Drv.I2c
+        
+        output port writeRead: Drv.I2cWriteRead
 
 
         ###############################################################################

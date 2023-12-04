@@ -78,24 +78,24 @@
         <channel name="systemResources.CPU_15"/>
     </packet>
 
-    <packet name="subsystems" id="8" level="2">
-        <channel name="subsystemsFileUplink.PacketsReceived"/>
-        <channel name="subsystemsFileUplink.Warnings"/>
-        <channel name="subsystemsFileUplink.FilesReceived"/>
-        <channel name="mkr1000.pirState"/>
-        <channel name="mkr1000.ldrVal"/>
-        <channel name="mkr1000.LED1State"/>
-        <channel name="mkr1000.LED2State"/>
-        <channel name="mkr1000.LED3State"/>
-        <channel name="mega_comm.BytesRecv"/>
-        <channel name="mega_comm.BytesSent"/>
-    
+    <packet name="subsystemsShared" id="8" level="2">
+        
         <channel name="subsystemsFileUplinkBufferManager.CurrBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.HiBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.NoBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.EmptyBuffs"/>
         <channel name="subsystemsFileUplinkBufferManager.TotalBuffs"/>
 
+    </packet>
+    <packet name="subsystems" id="9" level="2">
+        <channel name="subsystemsFileUplink.PacketsReceived"/>
+        <channel name="subsystemsFileUplink.Warnings"/>
+        <channel name="subsystemsFileUplink.FilesReceived"/>
+        <channel name="mkr1000.Distance"/>
+        <channel name="mkr1000.IRSensor"/>
+        <channel name="mega_comm.BytesRecv"/>
+        <channel name="mega_comm.BytesSent"/>
+        
         <channel name="gps.Longitude"/>
         <channel name="gps.Latitude"/>
         <channel name="gps.Altitude"/>
@@ -103,11 +103,21 @@
         <channel name="gps_comm.BytesSent"/>
         <channel name="gps_comm.BytesRecv"/>
         
-        <channel name="nano_comm.BytesRecv"/>
-        <channel name="nano_comm.BytesSent"/>
         <channel name="nano.ldrVal"/>
         <channel name="nano.ledPattern"/>
+        <channel name="nano_comm.BytesSent"/>
+        <channel name="nano_comm.BytesRecv"/>
+    </packet>
+
+    <packet name="subsystems_2" id="10" level="2">
+    
         
+        <channel name="myo.Pose"/>
+        <channel name="mega.elbowAngle"/>
+        <channel name="mega.forearmAngle"/>
+        <channel name="mega.wristAngle"/>
+        <channel name="mega.shoulderAngle"/>
+
     </packet>
 
 

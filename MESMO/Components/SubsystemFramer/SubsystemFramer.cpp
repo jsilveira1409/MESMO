@@ -61,11 +61,6 @@ namespace Components {
         my_framed_data.getSerializeRepr().serialize(0xdeadbeef); // Some start word
         my_framed_data.getSerializeRepr().serialize(size);       // Write size
         my_framed_data.getSerializeRepr().serialize(data, size, true); // Data copied to buffer no length included
-        printf("\n");
-        for (U32 i = 0; i < (8 + size); i++) {
-            printf("%x ", my_framed_data.getData()[i]);
-        }
-        printf("\n");
 
         this->send(my_framed_data);
     }

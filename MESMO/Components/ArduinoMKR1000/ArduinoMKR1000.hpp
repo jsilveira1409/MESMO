@@ -11,7 +11,6 @@
 
 namespace Components {
 
-  // Component Implementation Class
   class ArduinoMKR1000 :
     public ArduinoMKR1000ComponentBase
   {
@@ -47,36 +46,9 @@ namespace Components {
       */
       );
 
-      //! Handler implementation for bufferSendIn
-      //!
-      void bufferSendIn_handler(
-          const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &fwBuffer 
-      );
-
     PRIVATE:
 
-      // ----------------------------------------------------------------------
-      // Command handler implementations
-      // ----------------------------------------------------------------------
-
-      //! Implementation for SendString command handler
-      //! Command to send a string to the Payload
-      void SendString_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          const Fw::CmdStringArg& text /*!< 
-          String to send
-          */
-      );
-
-      //! Implementation for SendCommand command handler
-      //! Command to send a defined command to the Payload
-      void SendCommand_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
-          Components::ArduinoMKR1000_Commands payloadcommand 
-      );
+     
 
 
     };

@@ -3,6 +3,7 @@ module Components {
     active component ArduinoMega {
         
         enum MoveCommands{
+            NONE = 0x00
             SERVO_SHOULDER_SET = 0x01
             SERVO_ELBOW_SET = 0x02
             SERVO_FOREARM_SET = 0x03
@@ -52,7 +53,18 @@ module Components {
 
         output port PktSend : Fw.Com
 
+        sync input port move : Fw.BufferSend
+
+        # @ Example telemetry counter
+        telemetry shoulderAngle: U8
+        # @ Example telemetry counter
+        telemetry elbowAngle: U8
+        # @ Example telemetry counter
+        telemetry forearmAngle: U8
+        # @ Example telemetry counter
+        telemetry wristAngle : U8
         
+
         ###############################################################################
         # Standard AC Ports: Required for Channels, Events, Commands, and Parameters  #
         ###############################################################################

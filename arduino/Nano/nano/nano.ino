@@ -1,5 +1,5 @@
 // Define LED pins
-const int ledPins[] = {2, 3, 4, 5};
+const int ledPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
 const int numLeds = sizeof(ledPins) / sizeof(ledPins[0]);
 const int ldrPin = A6;
 uint8_t buffer[10];  // Buffer to store incoming data
@@ -8,13 +8,15 @@ uint8_t cmd = 0;
 String msg;
 int ldrValue = 0;
 
-
-// enum for servo's actions
 enum{
   LED_PATTERN_1 = 0x01,
   LED_PATTERN_2 = 0x02,
   LED_PATTERN_3 = 0x03,
-  READ_LDR = 0x04,
+  LED_PATTERN_4 = 0x04,
+  LED_PATTERN_5 = 0x05,
+  LED_PATTERN_6 = 0x06,
+  LED_PATTERN_7 = 0x07,
+  READ_LDR = 0x10,
 };
 
 void setup() {
@@ -23,7 +25,6 @@ void setup() {
     pinMode(ledPins[i], OUTPUT);
   }
   Serial.begin(115200); // opens serial port, sets data rate to 9600 bps
-  Serial.println("Starting System");
   pattern1();
   pattern2();
   pattern3();
@@ -37,44 +38,46 @@ void loop() {
   if (Serial.available() > 0) {
       int servo = 0; // for incoming serial data
       int data = 0;
-      bytesRead = Serial.readBytes(buffer, 10);  // Read 8 bytes into buffer
-      cmd = buffer[9];
+      bytesRead = Serial.readBytes(buffer, 2);  // Read 8 bytes into buffer
+      cmd = buffer[1];
 
-      data = buffer[8];
+      data = buffer[0];
 
       switch(cmd){
         case LED_PATTERN_1:
-          msg = "Running Patter 1";
           pattern1();
           break;
 
         case LED_PATTERN_2:
-          msg = "Running Pattern 2";
           pattern2();
           break;
 
         case LED_PATTERN_3:
-          msg = "Running Pattern 3";
           pattern3();
+          break;
+        
+        case LED_PATTERN_4:
+          pattern4();
+          break;
+        
+        case LED_PATTERN_5:
+          pattern5();
+          break;
+        
+        case LED_PATTERN_6:
+          pattern6();
+          break;
+        
+        case LED_PATTERN_7:
+          pattern7();
           break;
 
         case READ_LDR:
-            msg = "LDR Value at " + String(ldrValue);
             break;
 
         default:
-          Serial.print("Message Unknown: ");
-          for (int i = 0; i < 10;i ++){
-            Serial.print(buffer[i], HEX);  
-          }
-          Serial.println();
           break;
       };
-
-      int msg_size = msg.length();
-      msg = String(0xdeadbeef, HEX) + String(msg_size, HEX) + msg;            
-      Serial.println(msg);
-      msg = "";
   }  
 }
 
@@ -118,3 +121,57 @@ void pattern3(){
     digitalWrite(ledPins[i], LOW);
   }
 }
+
+void pattern4() {
+    // Light up from first to last
+    for (int i = 0; i < numLeds; i++) {
+        digitalWrite(ledPins[i], HIGH);
+        delay(100);
+        digitalWrite(ledPins[i], LOW);
+    }
+    // Light up from last to first
+    for (int i = numLeds - 1; i >= 0; i--) {
+        digitalWrite(ledPins[i], HIGH);
+        delay(100);
+        digitalWrite(ledPins[i], LOW);
+    }
+}
+
+void pattern5() {
+    // Turn all LEDs on
+    for (int i = 0; i < numLeds; i++) {
+        digitalWrite(ledPins[i], HIGH);
+    }
+    delay(500);
+
+    // Turn all LEDs off
+    for (int i = 0; i < numLeds; i++) {
+        digitalWrite(ledPins[i], LOW);
+    }
+    delay(500);
+}
+
+void pattern6() {
+    for (int j = 0; j < numLeds; j++) {
+        for (int i = 0; i < numLeds; i++) {
+            digitalWrite(ledPins[i], i == j ? HIGH : LOW);
+        }
+        delay(100);
+    }
+}
+
+void pattern7() {
+    // Turn all LEDs on
+    for (int i = 0; i < numLeds; i++) {
+        digitalWrite(ledPins[i], HIGH);
+    }
+    delay(500);
+
+    // Turn off LEDs one by one
+    for (int i = 0; i < numLeds; i++) {
+        digitalWrite(ledPins[i], LOW);
+        delay(200);
+    }
+}
+
+

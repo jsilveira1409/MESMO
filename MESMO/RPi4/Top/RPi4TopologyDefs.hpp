@@ -28,6 +28,7 @@ struct TopologyState {
     const CHAR* nanoComm;
     const CHAR* megaComm;
     const CHAR* gpsComm;
+    const CHAR* mkrComm;
 };
 
 /**

@@ -14,6 +14,13 @@ namespace Components {
   class ArduinoMega :
     public ArduinoMegaComponentBase
   {
+    enum Move_t {
+      LEFT = 1,
+      RIGHT,
+      UP,
+      DOWN,
+      NONE = 0xff
+    };
 
     public:
 
@@ -30,6 +37,8 @@ namespace Components {
       //! Destroy object ArduinoMega
       //!
       ~ArduinoMega();
+
+      void set_comm();
 
     PRIVATE:
 
@@ -52,6 +61,13 @@ namespace Components {
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
           Fw::Buffer &fwBuffer 
       );
+
+      //! Handler implementation for move
+      //!
+      void move_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          Fw::Buffer &fwBuffer 
+      );      
 
     PRIVATE:
 
@@ -87,7 +103,14 @@ namespace Components {
           U8 speed 
       );
 
+      
 
+      U8 shoulder_angle;
+      U8 elbow_angle;
+      U8 forearm_angle;
+      U8 wrist_angle;
+      Move_t move_cmd = Move_t::NONE;    
+      bool comm_open = false;   
     };
 
 } // end namespace Components

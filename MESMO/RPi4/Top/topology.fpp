@@ -49,8 +49,6 @@ module RPi4 {
 
     # custom components
     instance mkr1000
-    instance mkr1000_deframer
-    instance mkr1000_framer
     instance mkr1000_comm
 
     instance camera
@@ -68,8 +66,13 @@ module RPi4 {
 
     instance nano
     instance nano_comm
-    instance nano_deframer
-    instance nano_framer
+    #instance nano_deframer
+    #instance nano_framer
+
+    instance myo
+    instance myo_comm
+    instance myo_deframer
+    instance myo_framer
 
     # ----------------------------------------------------------------------
     # Pattern graph specifiers
@@ -171,23 +174,13 @@ module RPi4 {
     }
 
     connections MKR1000 {
-      mkr1000.PktSend -> mkr1000_framer.comIn
-
-      mkr1000_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      mkr1000_framer.framedOut -> mkr1000_comm.send
-
-      mkr1000_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
-      mkr1000_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      mkr1000_comm.$recv -> mkr1000_deframer.framedIn
-      
-      mkr1000_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      mkr1000_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      mkr1000_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      mkr1000_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
-      mkr1000_deframer.bufferOut -> mkr1000.bufferSendIn 
+      rateGroup1.RateGroupMemberOut[4] -> mkr1000.Run
+      mkr1000.read ->mkr1000_comm.read
+      mkr1000.write ->mkr1000_comm.write
+      mkr1000.writeRead ->mkr1000_comm.writeRead
     }
 
-    connections Rpi4Camera {
+    connections Camera {
       camera.HwPktSend -> camera_framer.comIn
       
       camera_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
@@ -205,6 +198,8 @@ module RPi4 {
     }
 
     connections Mega {
+      rateGroup1.RateGroupMemberOut[3] -> mega.Run
+      
       mega.PktSend -> mega_framer.comIn
       
       mega_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
@@ -232,23 +227,56 @@ module RPi4 {
       gps_comm.ready -> gps.ready
      }
 
-     connections Nano{
-      nano.PktSend -> nano_framer.comIn
-      
-      nano_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      nano_framer.framedOut -> nano_comm.send
-
-      nano_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
+    connections Nano {
+      nano.send -> nano_comm.send 
+      nano.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      nano.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      #nano_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
       nano_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      nano_comm.$recv -> nano_deframer.framedIn
-      
-      nano_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      nano_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-      nano_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-      nano_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
-      nano_deframer.bufferOut -> nano.bufferSendIn 
+      nano_comm.$recv -> nano.$recv
+      nano_comm.ready -> nano.ready
 
-     }
+    }
+
+
+    connections Myo {
+      myo.HwPktSend -> myo_framer.comIn
+      
+      myo_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      myo_framer.framedOut -> myo_comm.send
+
+      myo_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      myo_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      myo_comm.$recv -> myo_deframer.framedIn
+      
+      myo_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      myo_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      myo_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      myo_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      myo_deframer.bufferOut -> myo.bufferSendIn 
+
+      myo.move -> mega.move
+    }
+
+
+
+     #connections Nano{
+     # nano.PktSend -> nano_framer.comIn
+     # 
+     # nano_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+     # nano_framer.framedOut -> nano_comm.send
+#
+     # nano_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
+     # nano_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+     # nano_comm.$recv -> nano_deframer.framedIn
+     # 
+     # nano_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+     # nano_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+     # nano_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+     # nano_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+     # nano_deframer.bufferOut -> nano.bufferSendIn 
+#
+     #}
 
   }
 

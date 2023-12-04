@@ -87,10 +87,7 @@ module RPi4 {
     stack size Default.STACK_SIZE \
     priority 96
 
-  instance mkr1000: Components.ArduinoMKR1000 base id 0x0E00 \
-    queue size Default.QUEUE_SIZE \
-    stack size Default.STACK_SIZE \
-    priority 95
+  instance mkr1000: Components.ArduinoMKR1000 base id 0x0E00
 
   instance camera: Components.Camera base id 0x0E10 \
     queue size Default.QUEUE_SIZE \
@@ -109,25 +106,26 @@ module RPi4 {
     stack size Default.STACK_SIZE \
     priority 92
 
-  
-  instance mkr1000_framer : Components.SubsystemFramer base id 0x1000 
-  instance mkr1000_deframer : Components.SubsystemDeframer base id 0x1001
-  instance mkr1000_comm: Drv.ByteStreamDriverModel base id 0x1002 type "Drv::LinuxUartDriver" at "../../Drv/LinuxUartDriver/LinuxUartDriver.hpp" 
+  instance myo : Components.MYO base id 0x0E50 
+  instance mkr1000_comm: Drv.LinuxI2cDriver base id 0x1000
 
   instance camera_framer : Components.SubsystemFramer base id 0x1010
   instance camera_deframer : Components.SubsystemDeframer base id 0x1011
   instance camera_comm: Drv.ByteStreamDriverModel base id 0x1012 type "Drv::TcpClient" at "../../Drv/TcpClient/TcpClient.hpp"
 
-  instance mega_comm: Drv.LinuxUartDriver base id 0x1022
   instance mega_framer : Components.SubsystemFramer base id 0x1020
   instance mega_deframer : Components.SubsystemDeframer base id 0x1021
+  instance mega_comm: Drv.LinuxUartDriver base id 0x1022
 
   instance gps_comm: Drv.LinuxUartDriver base id 0x1030
 
+  #instance nano_framer : Components.SubsystemFramer base id 0x1050
+  #instance nano_deframer : Components.SubsystemDeframer base id 0x1060
   instance nano_comm: Drv.LinuxUartDriver base id 0x1040
-  instance nano_framer : Components.SubsystemFramer base id 0x1050
-  instance nano_deframer : Components.SubsystemDeframer base id 0x1060
 
+  instance myo_framer : Components.SubsystemFramer base id 0x1070
+  instance myo_deframer : Components.SubsystemDeframer base id 0x1080
+  instance myo_comm : Drv.ByteStreamDriverModel base id 0x1090 type "Drv::TcpClient" at "../../Drv/TcpClient/TcpClient.hpp"
   
   ## subsystems Shares Ressources
     instance subsystemsFileUplink: Svc.FileUplink base id 0x1300 \

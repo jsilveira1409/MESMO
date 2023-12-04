@@ -7,6 +7,7 @@
 
 #include <Components/Camera/Camera.hpp>
 #include <FpConfig.hpp>
+#include <Fw/Types/String.hpp>
 
 namespace Components {
 
@@ -57,6 +58,17 @@ namespace Components {
         Fw::Buffer &fwBuffer
     )
   {
+    // check if first chars are "center"
+    U8* data = (U8*)fwBuffer.getData();
+    U32 size = fwBuffer.getSize();
+    Fw::String str((char*)data);
+    if (size > 6) {
+      if (str == "center") {
+        U32 x = (U32) data[6] << 24 | data[7] << 16 | data[8] << 8 | data[9];
+        U32 y = (U32) data[10] << 24 | data[11] << 16 | data[12] << 8 | data[13];
+        printf("x: %d, y: %d\n", x, y);
+      }
+    }
   }
 
   // ----------------------------------------------------------------------

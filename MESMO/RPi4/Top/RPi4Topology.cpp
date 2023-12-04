@@ -137,6 +137,8 @@ void configureTopology() {
     subsystemsBuffMgrBins.bins[4].numBuffers = 20;
     subsystemsBuffMgrBins.bins[5].bufferSize = 2048;
     subsystemsBuffMgrBins.bins[5].numBuffers = 20;
+    subsystemsBuffMgrBins.bins[5].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[5].numBuffers = 20;
     subsystemsFileUplinkBufferManager.setup(SUBSYSTEMS_BUFFER_MANAGER_ID, 0, mallocator, subsystemsBuffMgrBins);
 
     // Framer and Deframer components need to be passed a protocol handler
@@ -187,6 +189,7 @@ void setupTopology(const TopologyState& state) {
         bool mega_com_open = mega_comm.open(state.megaComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
         printf("Arduino Mega Driver Open : %d\n", mega_com_open);
         mega_comm.startReadThread();
+        mega.set_comm();
     }
     
     //On board Camera
@@ -196,8 +199,8 @@ void setupTopology(const TopologyState& state) {
 
     //GPS
     if (state.gpsComm == nullptr) {
-        printf("GPS Comm is null. Defaulting to AMA1\n");
-        bool gps_com_open = gps_comm.open("/dev/ttyAMA1", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+        printf("GPS Comm is null. Defaulting to AMA4\n");
+        bool gps_com_open = gps_comm.open("/dev/ttyAMA4", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
         printf("GPS Driver Open : %d\n", gps_com_open);
         gps_comm.startReadThread();
     }else{
@@ -207,14 +210,31 @@ void setupTopology(const TopologyState& state) {
     }
 
     //Nano
+    bool nano_com_open = false;
     if (state.nanoComm == nullptr) {
         printf("Nano Comm is null\n");
     }else{
-        bool nano_com_open = nano_comm.open(state.nanoComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
-        printf("Arduino Nano Driver Open : %d\n", nano_com_open);
+        nano_com_open = nano_comm.open(state.nanoComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
         nano_comm.startReadThread();
+    }    
+    printf("Arduino Nano Driver Open : %d\n", nano_com_open);
+
+    //MYO
+    Os::TaskString MyoTask("CameraTask");
+    myo_comm.configure("0.0.0.0", 50002);
+    myo_comm.startSocketTask(MyoTask, true, COMM_PRIORITY, Default::STACK_SIZE);
+
+    //MKR
+    bool mkr_com_open = false;
+    if (state.mkrComm == nullptr) {
+        printf("MKR Comm is null\n");
+        mkr_com_open = mkr1000_comm.open("/dev/i2c-1");
+    }else{
+        mkr_com_open = mkr1000_comm.open(state.mkrComm);
     }
+    printf("Arduino MKR Driver Open : %d\n", mkr_com_open);
     
+
 }
 
 // Variables used for cycle simulation

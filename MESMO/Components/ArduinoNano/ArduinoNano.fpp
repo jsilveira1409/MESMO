@@ -6,14 +6,13 @@ module Components {
             LED_PATTERN_1 = 0x01
             LED_PATTERN_2 = 0x02
             LED_PATTERN_3 = 0x03
-            READ_LDR = 0x04
+            LED_PATTERN_4 = 0x04
+            LED_PATTERN_5 = 0x05
+            LED_PATTERN_6 = 0x06
+            LED_PATTERN_7 = 0x07
         }
         
-        @ Command to send a string to the Payload
-        async command SendString(
-                                    $text: string size 40 @< String to send
-                                ) \
-        opcode 0
+  
 
         @ Command to send a defined command to the Payload
         async command SendCommand (
@@ -38,15 +37,19 @@ module Components {
         # General ports
         # -------------------------------------------------
 
-        async input port Run: Svc.Sched
+        sync input port ready: Drv.ByteStreamReady
 
-        output port deallocate : Fw.BufferSend
+        sync input port $recv: Drv.ByteStreamRecv
 
-        output port allocate : Fw.BufferGet
+        output port send: Drv.ByteStreamSend
 
-        async input port bufferSendIn: Fw.BufferSend
+        output port allocate: Fw.BufferGet
 
-        output port PktSend : Fw.Com
+        output port deallocate: Fw.BufferSend
+        
+        
+
+        
 
         ###############################################################################
         # Standard AC Ports: Required for Channels, Events, Commands, and Parameters  #

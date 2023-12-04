@@ -32,44 +32,30 @@ namespace Components {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void ArduinoNano ::
-    Run_handler(
-        const NATIVE_INT_TYPE portNum,
-        NATIVE_UINT_TYPE context
+   void ArduinoNano ::
+    ready_handler(
+        const NATIVE_INT_TYPE portNum
     )
-  {
-    // TODO
-  }
+    {
+      // TODO
+    }
 
-  void ArduinoNano ::
-    bufferSendIn_handler(
-        const NATIVE_INT_TYPE portNum,
-        Fw::Buffer &fwBuffer
-    )
-  {
-    const U8* data = fwBuffer.getData();
-
-  }
+    void ArduinoNano ::
+      recv_handler(
+          const NATIVE_INT_TYPE portNum,
+          Fw::Buffer &recvBuffer,
+          const Drv::RecvStatus &recvStatus
+      )
+    {
+      printf("Received: %x\n", recvBuffer.getData()[0]);
+      this->deallocate_out(portNum, recvBuffer);
+    }
 
   // ----------------------------------------------------------------------
   // Command handler implementations
   // ----------------------------------------------------------------------
 
-  void ArduinoNano ::
-    SendString_cmdHandler(
-        const FwOpcodeType opCode,
-        const U32 cmdSeq,
-        const Fw::CmdStringArg& text
-    )
-  {
-    Fw::ComBuffer arg;
-    U8* textPtr = (U8*)text.toChar();
-    U32 size = text.getCapacity();
-    arg = Fw::ComBuffer(textPtr, size);
-
-    this->PktSend_out(0, arg, 0);
-    this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
-  }
+  
 
   void ArduinoNano ::
     SendCommand_cmdHandler(
@@ -81,11 +67,12 @@ namespace Components {
     const U32 size = 2;
     printf("Command: %x\n", payloadcommand.e);
     U8 data[size] = {0x00, payloadcommand.e};
-    
-    Fw::ComBuffer arg(data, size);
-    
-    this->PktSend_out(0, arg, 0);
-    this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
+    Fw::Buffer buff(data, size);
+  
+    this->send_out(0, buff);
+    this->tlmWrite_ldrVal(payloadcommand.e);
+    this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);  
+
   }
 
 } // end namespace Components

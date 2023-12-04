@@ -51,10 +51,11 @@ int main(int argc, char* argv[]) {
     CHAR* nanoComm = nullptr;
     CHAR* megaComm = nullptr;
     CHAR* gpsComm = nullptr;
+    CHAR* mkrComm = nullptr;
     U16 port_number = 0;
 
     // Loop while reading the getopt supplied options
-    while ((option = getopt(argc, argv, "hp:a:m:n:g:")) != -1) {
+    while ((option = getopt(argc, argv, "hp:a:m:n:g:k:")) != -1) {
         printf("optarg: %s\n", optarg);
         switch (option) {
             // Handle the -a argument for address/hostname
@@ -74,6 +75,9 @@ int main(int argc, char* argv[]) {
             case 'g':
                 gpsComm = optarg;
                 break;
+            case 'k':
+                mkrComm = optarg;
+                break;
             // Cascade intended: help output
             case 'h':
             // Cascade intended: help output
@@ -91,6 +95,7 @@ int main(int argc, char* argv[]) {
     inputs.nanoComm = nanoComm;
     inputs.megaComm = megaComm;
     inputs.gpsComm = gpsComm;
+    inputs.mkrComm = mkrComm;
     printf("input.nanoComm: %s\n", inputs.nanoComm);
     // Setup program shutdown via Ctrl-C
     signal(SIGINT, signalHandler);
@@ -99,7 +104,7 @@ int main(int argc, char* argv[]) {
 
     // Setup, cycle, and teardown topology
     RPi4::setupTopology(inputs);
-    RPi4::startSimulatedCycle(1000);  // Program loop cycling rate groups at 1Hz
+    RPi4::startSimulatedCycle(50);  // Program loop cycling rate groups at 1Hz
     RPi4::teardownTopology(inputs);
     (void)printf("Exiting...\n");
     return 0;
