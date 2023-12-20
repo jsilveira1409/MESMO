@@ -86,13 +86,6 @@ namespace Components {
       // Command handler implementations
       // ----------------------------------------------------------------------
 
-      //! Implementation for ReportLockStatus command handler
-      //! A command to force an EVR reporting lock status.
-      void ReportLockStatus_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq /*!< The command sequence number*/
-      );
-
 
       //!< Has the device acquired GPS lock?
       bool m_locked;

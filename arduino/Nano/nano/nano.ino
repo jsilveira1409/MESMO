@@ -31,14 +31,12 @@ void setup() {
 }
            
 
-void loop() {
-  ldrValue = analogRead(ldrPin);
-  
+void loop() { 
 
   if (Serial.available() > 0) {
       int servo = 0; // for incoming serial data
       int data = 0;
-      bytesRead = Serial.readBytes(buffer, 2);  // Read 8 bytes into buffer
+      bytesRead = Serial.readBytes(buffer, 2);  // Read 2 bytes into buffer
       cmd = buffer[1];
 
       data = buffer[0];

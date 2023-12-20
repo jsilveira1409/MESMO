@@ -12,9 +12,6 @@ module Components {
 
         output port deallocate: Fw.BufferSend
         
-        @ A command to force an EVR reporting lock status.
-        sync command ReportLockStatus() opcode 0
-
         event LockAcquired() severity activity high id 0 format "GPS Lock acquired"
 
         event LockLost() severity activity high id 1 format "GPS Lock lost"

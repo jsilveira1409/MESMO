@@ -1,3 +1,5 @@
 .vscode/
 fprime-venv/
 MESMO/build-*
+video/
+MESMO/venv/

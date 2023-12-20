@@ -126,14 +126,4 @@ namespace Components {
   // Command handler implementations
   // ----------------------------------------------------------------------
 
-  void Gps ::
-    ReportLockStatus_cmdHandler(
-        const FwOpcodeType opCode,
-        const U32 cmdSeq
-    )
-  {
-    // TODO
-    this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
-  }
-
 } // end namespace Components

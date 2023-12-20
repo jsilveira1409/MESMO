@@ -183,14 +183,17 @@ void setupTopology(const TopologyState& state) {
         comDriver.startSocketTask(name, true, COMM_PRIORITY, Default::STACK_SIZE);
     }
     // Mega
+    bool mega_com_open = false;
     if (state.megaComm == nullptr) {
-        printf("Mega Comm is null\n");
+        printf("Mega Comm is null. Defaulting to /dev/ttyAMA5\n");
+        mega_com_open = mega_comm.open("/dev/ttyAMA5", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
     }else{
-        bool mega_com_open = mega_comm.open(state.megaComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
-        printf("Arduino Mega Driver Open : %d\n", mega_com_open);
-        mega_comm.startReadThread();
-        mega.set_comm();
+        mega_com_open = mega_comm.open(state.megaComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
+        
     }
+    printf("Arduino Mega Driver Open : %d\n", mega_com_open);
+    mega_comm.startReadThread();
+    mega.set_comm();
     
     //On board Camera
     Os::TaskString CameraTask("CameraTask");

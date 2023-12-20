@@ -38,7 +38,7 @@ void setup() {
   servoForearm.attach(servoForearmPin);  
   servoWrist.attach(servoWristPin);  
 
-  Serial.begin(115200); 
+  Serial1.begin(115200); 
   servoShoulder.write(70);
   servoElbow.write(70);
   servoForearm.write(70);
@@ -68,10 +68,10 @@ int bytesRead = 0;    // Number of bytes read
 
 void loop() {
   
-  if (Serial.available() > 0) {
+  if (Serial1.available() > 0) {
       int servo = 0; // for incoming serial data
       int data = 0;
-      bytesRead = Serial.readBytes(buffer, 10);  // Read 10 bytes into buffer
+      bytesRead = Serial1.readBytes(buffer, 10);  // Read 10 bytes into buffer
       // first byte in message chooses which servo to set to the specified angle
       servo = buffer[8];
       // second byte in message sets the angle to set it to
