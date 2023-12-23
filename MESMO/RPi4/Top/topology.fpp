@@ -74,6 +74,11 @@ module RPi4 {
     instance myo_deframer
     instance myo_framer
 
+    instance activeGpio
+    instance active_gpio_comm
+    instance passiveGpio
+    instance passive_gpio_comm
+
     # ----------------------------------------------------------------------
     # Pattern graph specifiers
     # ----------------------------------------------------------------------
@@ -253,26 +258,9 @@ module RPi4 {
       myo.move -> mega.move
     }
 
-
-
-     #connections Nano{
-     # nano.PktSend -> nano_framer.comIn
-     # 
-     # nano_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-     # nano_framer.framedOut -> nano_comm.send
-#
-     # nano_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
-     # nano_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-     # nano_comm.$recv -> nano_deframer.framedIn
-     # 
-     # nano_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-     # nano_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
-     # nano_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
-     # nano_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
-     # nano_deframer.bufferOut -> nano.bufferSendIn 
-#
-     #}
-
+    connections Testbench {
+      activeGpio.gpioWrite -> active_gpio_comm.gpioWrite
+      passiveGpio.gpioWrite -> passive_gpio_comm.gpioWrite
+    }
   }
-
 }

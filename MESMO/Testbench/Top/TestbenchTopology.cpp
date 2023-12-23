@@ -1,24 +1,22 @@
 // ======================================================================
-// \title  RPi4Topology.cpp
+// \title  TestbenchTopology.cpp
 // \brief cpp file containing the topology instantiation code
 //
 // ======================================================================
 // Provides access to autocoded functions
-#include <RPi4/Top/RPi4TopologyAc.hpp>
-#include <RPi4/Top/RPi4PacketsAc.hpp>
+#include <Testbench/Top/TestbenchTopologyAc.hpp>
+#include <Testbench/Top/TestbenchPacketsAc.hpp>
 
 // Necessary project-specified types
 #include <Fw/Types/MallocAllocator.hpp>
 #include <Os/Log.hpp>
 #include <Svc/FramingProtocol/FprimeProtocol.hpp>
-#include <Svc/FramingProtocol/DeframingProtocol.hpp>
 
 // Used for 1Hz synthetic cycling
 #include <Os/Mutex.hpp>
 
-
 // Allows easy reference to objects in FPP/autocoder required namespaces
-using namespace RPi4;
+using namespace Testbench;
 
 // Instantiate a system logger that will handle Fw::Logger::logMsg calls
 Os::Log logger;
@@ -31,7 +29,6 @@ Fw::MallocAllocator mallocator;
 // framing and deframing implementations.
 Svc::FprimeFraming framing;
 Svc::FprimeDeframing deframing;
-
 
 Svc::ComQueue::QueueConfigurationTable configurationTable;
 
@@ -55,15 +52,12 @@ enum TopologyConstants {
     COMM_PRIORITY = 100,
     // bufferManager constants
     FRAMER_BUFFER_SIZE = FW_MAX(FW_COM_BUFFER_MAX_SIZE, FW_FILE_BUFFER_MAX_SIZE + sizeof(U32)) + HASH_DIGEST_LENGTH + Svc::FpFrameHeader::SIZE,
-    FRAMER_BUFFER_COUNT = 10,
+    FRAMER_BUFFER_COUNT = 30,
     DEFRAMER_BUFFER_SIZE = FW_MAX(FW_COM_BUFFER_MAX_SIZE, FW_FILE_BUFFER_MAX_SIZE + sizeof(U32)),
-    DEFRAMER_BUFFER_COUNT = 10,
-    COM_DRIVER_BUFFER_SIZE = 491520,
-    COM_DRIVER_BUFFER_COUNT = 20,
-    BUFFER_MANAGER_ID = 200,
-    SUBSYSTEMS_DRIVER_BUFFER_SIZE = 491520,
-    SUBSYSTEMS_DRIVER_BUFFER_COUNT = 30,
-    SUBSYSTEMS_BUFFER_MANAGER_ID = 201
+    DEFRAMER_BUFFER_COUNT = 30,
+    COM_DRIVER_BUFFER_SIZE = 3000,
+    COM_DRIVER_BUFFER_COUNT = 30,
+    BUFFER_MANAGER_ID = 200
 };
 
 // Ping entries are autocoded, however; this code is not properly exported. Thus, it is copied here.
@@ -111,8 +105,8 @@ void configureTopology() {
 
     // Health is supplied a set of ping entires.
     health.setPingEntries(pingEntries, FW_NUM_ARRAY_ELEMENTS(pingEntries), HEALTH_WATCHDOG_CODE);
-    
-   // Buffer managers need a configured set of buckets and an allocator used to allocate memory for those buckets.
+
+    // Buffer managers need a configured set of buckets and an allocator used to allocate memory for those buckets.
     Svc::BufferManager::BufferBins upBuffMgrBins;
     memset(&upBuffMgrBins, 0, sizeof(upBuffMgrBins));
     upBuffMgrBins.bins[0].bufferSize = FRAMER_BUFFER_SIZE;
@@ -123,30 +117,12 @@ void configureTopology() {
     upBuffMgrBins.bins[2].numBuffers = COM_DRIVER_BUFFER_COUNT;
     bufferManager.setup(BUFFER_MANAGER_ID, 0, mallocator, upBuffMgrBins);
 
-    Svc::BufferManager::BufferBins subsystemsBuffMgrBins;
-    memset(&subsystemsBuffMgrBins, 0, sizeof(subsystemsBuffMgrBins));
-    subsystemsBuffMgrBins.bins[0].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
-    subsystemsBuffMgrBins.bins[0].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
-    subsystemsBuffMgrBins.bins[1].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
-    subsystemsBuffMgrBins.bins[1].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
-    subsystemsBuffMgrBins.bins[2].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
-    subsystemsBuffMgrBins.bins[2].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
-    subsystemsBuffMgrBins.bins[3].bufferSize = 2048;
-    subsystemsBuffMgrBins.bins[3].numBuffers = 20;
-    subsystemsBuffMgrBins.bins[4].bufferSize = 2048;
-    subsystemsBuffMgrBins.bins[4].numBuffers = 20;
-    subsystemsBuffMgrBins.bins[5].bufferSize = 2048;
-    subsystemsBuffMgrBins.bins[5].numBuffers = 20;
-    subsystemsBuffMgrBins.bins[5].bufferSize = 2048;
-    subsystemsBuffMgrBins.bins[5].numBuffers = 20;
-    subsystemsFileUplinkBufferManager.setup(SUBSYSTEMS_BUFFER_MANAGER_ID, 0, mallocator, subsystemsBuffMgrBins);
-
     // Framer and Deframer components need to be passed a protocol handler
     framer.setup(framing);
     deframer.setup(deframing);
 
     // Note: Uncomment when using Svc:TlmPacketizer
-    // tlmSend.setPacketList(RPi4PacketsPkts, RPi4PacketsIgnore, 1);
+    // tlmSend.setPacketList(TestbenchPacketsPkts, TestbenchPacketsIgnore, 1);
 
     // Events (highest-priority)
     configurationTable.entries[0] = {.depth = 100, .priority = 0};
@@ -158,8 +134,8 @@ void configureTopology() {
     comQueue.configure(configurationTable, 0, mallocator);
 }
 
-// Public functions for use in main program are namespaced with deployment name RPi4
-namespace RPi4 {
+// Public functions for use in main program are namespaced with deployment name Testbench
+namespace Testbench {
 void setupTopology(const TopologyState& state) {
     // Autocoded initialization. Function provided by autocoder.
     initComponents(state);
@@ -175,71 +151,18 @@ void setupTopology(const TopologyState& state) {
     // loadParameters();
     // Autocoded task kick-off (active components). Function provided by autocoder.
     startTasks(state);
-    // Initialize socket communication if and only if there is a valid specification
-    if (state.hostname != nullptr && state.port != 0) {
+    if (state.uartDevice != nullptr) {
         Os::TaskString name("ReceiveTask");
         // Uplink is configured for receive so a socket task is started
-        comDriver.configure(state.hostname, state.port);
-        comDriver.startSocketTask(name, true, COMM_PRIORITY, Default::STACK_SIZE);
-    }
-    // Mega
-    bool mega_com_open = false;
-    if (state.megaComm == nullptr) {
-        printf("Mega Comm is null. Defaulting to /dev/ttyAMA5\n");
-        mega_com_open = mega_comm.open("/dev/ttyAMA5", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
-    }else{
-        mega_com_open = mega_comm.open(state.megaComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
-        
-    }
-    printf("Arduino Mega Driver Open : %d\n", mega_com_open);
-    mega_comm.startReadThread();
-    mega.set_comm();
-    
-    //On board Camera
-    Os::TaskString CameraTask("CameraTask");
-    camera_comm.configure("0.0.0.0", 50001);
-    camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
-
-    //GPS
-    if (state.gpsComm == nullptr) {
-        printf("GPS Comm is null. Defaulting to AMA4\n");
-        bool gps_com_open = gps_comm.open("/dev/ttyAMA4", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
-        printf("GPS Driver Open : %d\n", gps_com_open);
-        gps_comm.startReadThread();
-    }else{
-        bool gps_com_open = gps_comm.open(state.gpsComm, Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
-        printf("GPS Driver Open : %d\n", gps_com_open);
-        gps_comm.startReadThread();
+        if (comDriver.open(state.uartDevice, static_cast<Drv::LinuxUartDriver::UartBaudRate>(state.baudRate), 
+                           Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, Svc::DeframerCfg::RING_BUFFER_SIZE)) {
+            comDriver.startReadThread(COMM_PRIORITY, Default::STACK_SIZE);
+        } else {
+            printf("Failed to open UART device %s at baud rate %" PRIu32 "\n", state.uartDevice, state.baudRate);
+        }
     }
 
-    //Nano
-    bool nano_com_open = false;
-    if (state.nanoComm == nullptr) {
-        printf("Nano Comm is null\n");
-    }else{
-        nano_com_open = nano_comm.open(state.nanoComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
-        nano_comm.startReadThread();
-    }    
-    printf("Arduino Nano Driver Open : %d\n", nano_com_open);
-
-    //MYO
-    Os::TaskString MyoTask("CameraTask");
-    myo_comm.configure("0.0.0.0", 50002);
-    myo_comm.startSocketTask(MyoTask, true, COMM_PRIORITY, Default::STACK_SIZE);
-
-    //MKR
-    bool mkr_com_open = false;
-    if (state.mkrComm == nullptr) {
-        printf("MKR Comm is null\n");
-        mkr_com_open = mkr1000_comm.open("/dev/i2c-1");
-    }else{
-        mkr_com_open = mkr1000_comm.open(state.mkrComm);
-    }
-    printf("Arduino MKR Driver Open : %d\n", mkr_com_open);
-
-    active_gpio_comm.open(4, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
-    passive_gpio_comm.open(17, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
-    
+    //active_gpio_comm.open(4, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
 
 }
 
@@ -254,7 +177,7 @@ void startSimulatedCycle(U32 milliseconds) {
 
     // Main loop
     while (cycling) {
-        RPi4::blockDrv.callIsr();
+        Testbench::blockDrv.callIsr();
         Os::Task::delay(milliseconds);
 
         cycleLock.lock();
@@ -275,12 +198,11 @@ void teardownTopology(const TopologyState& state) {
     freeThreads(state);
 
     // Other task clean-up.
-    comDriver.stopSocketTask();
-    (void)comDriver.joinSocketTask(nullptr);
+    comDriver.quitReadThread();
+    (void)comDriver.join(nullptr);
 
     // Resource deallocation
     cmdSeq.deallocateBuffer(mallocator);
     bufferManager.cleanup();
-    subsystemsFileUplinkBufferManager.cleanup();
 }
-};  // namespace RPi4
+};  // namespace Testbench
