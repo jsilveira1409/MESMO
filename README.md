@@ -1,2 +1,2 @@
-# MESMO AssiM
-Modular Embedded Systems Management Software Oriented Assistance Machine
+# MESMO 
+Modular Embedded Systems Management and Orchestration project
