@@ -44,6 +44,7 @@ namespace Components {
     Fw::Buffer buffer(data, 2);
     
     this->read_out(0, 0x08, buffer);
+    this->write_out(0, 0x08, buffer);
     
     U16 value = (data[1] << 8) | data[0];
     F32 distance = 29988 * pow(value, -1.173);

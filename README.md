@@ -12,11 +12,21 @@ To comprehensively assess the MESMO project's performance and communication effi
 
 [Functional Video](https://www.youtube.com/watch?v=4ISu5jYeB7Q&ab_channel=JoaquimSilveira)
 
+![](imgs/1.jpg)
+![](imgs/2.jpg)
+![](imgs/4.jpg)
+![](imgs/5.jpg)
+![](imgs/6.jpg)
+
 ## Subsystems 
 ### Robotic Arm and MYO Armband
+![](imgs/arm.gif)
 ### Arduino Nano and LEDs
+![](imgs/nano.gif)
 ### Arduino MKR1000 and distance sensor
+![](imgs/mkr.gif)
 ### Raspberry Pi Camera
+![](imgs/camera.gif)
 
 
 

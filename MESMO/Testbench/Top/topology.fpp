@@ -42,8 +42,40 @@ module Testbench {
     instance textLogger
     instance systemResources
 
-    instance gpio_comm
+    # custom components shared components
+    instance subsystemsFileUplinkBufferManager
+    instance subsystemsStaticMemory
+    instance subsystemsFileUplink
+
+    # custom components
+    instance mkr1000
+    instance mkr1000_comm
+
+    instance camera
+    instance camera_deframer
+    instance camera_framer
+    instance camera_comm
+
+    instance mega
+    instance mega_comm
+    instance mega_deframer
+    instance mega_framer
+
+    instance gps
+    instance gps_comm
+
+    instance nano
+    instance nano_comm
+
+    instance myo
+    instance myo_comm
+    instance myo_deframer
+    instance myo_framer
+
     instance activeGpio
+    instance active_gpio_comm
+    instance passiveGpio
+    instance passive_gpio_comm
 
     # ----------------------------------------------------------------------
     # Pattern graph specifiers
@@ -137,7 +169,97 @@ module Testbench {
     }
 
     connections Testbench {
-      activeGpio.gpioWrite -> gpio_comm.gpioWrite
+      activeGpio.gpioWrite -> active_gpio_comm.gpioWrite
+      passiveGpio.gpioWrite -> passive_gpio_comm.gpioWrite
+
+    }
+
+
+    connections SubsystemsSharedRessources {
+      subsystemsFileUplink.bufferSendOut -> subsystemsFileUplinkBufferManager.bufferSendIn
+    }
+
+    connections MKR1000 {
+      rateGroup1.RateGroupMemberOut[4] -> mkr1000.Run
+      mkr1000.read ->mkr1000_comm.read
+      mkr1000.write ->mkr1000_comm.write
+      mkr1000.writeRead ->mkr1000_comm.writeRead
+    }
+
+    connections Camera {
+      camera.HwPktSend -> camera_framer.comIn
+      
+      camera_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      camera_framer.framedOut -> camera_comm.send
+
+      camera_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      camera_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      camera_comm.$recv -> camera_deframer.framedIn
+      
+      camera_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      camera_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      camera_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      camera_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      camera_deframer.bufferOut -> camera.bufferSendIn 
+    }
+
+    connections Mega {
+      rateGroup1.RateGroupMemberOut[3] -> mega.Run
+      
+      mega.PktSend -> mega_framer.comIn
+      
+      mega_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mega_framer.framedOut -> mega_comm.send
+
+      mega_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn    
+      mega_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mega_comm.$recv -> mega_deframer.framedIn
+      
+      mega_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      mega_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      mega_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      mega_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      mega_deframer.bufferOut -> mega.bufferSendIn 
+
+    }
+
+     connections GPS {
+      gps.send -> gps_comm.send 
+      gps.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      gps.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      gps_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      gps_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      gps_comm.$recv -> gps.$recv
+      gps_comm.ready -> gps.ready
+     }
+
+    connections Nano {
+      nano.send -> nano_comm.send 
+      nano.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      nano.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      nano_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      nano_comm.$recv -> nano.$recv
+      nano_comm.ready -> nano.ready
+    }
+
+
+    connections Myo {
+      myo.HwPktSend -> myo_framer.comIn
+      
+      myo_framer.framedAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      myo_framer.framedOut -> myo_comm.send
+
+      myo_comm.deallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      myo_comm.allocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      myo_comm.$recv -> myo_deframer.framedIn
+      
+      myo_deframer.framedDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      myo_deframer.bufferAllocate -> subsystemsFileUplinkBufferManager.bufferGetCallee
+      myo_deframer.bufferDeallocate -> subsystemsFileUplinkBufferManager.bufferSendIn
+      myo_deframer.FilePktSend -> subsystemsFileUplink.bufferSendIn
+      myo_deframer.bufferOut -> myo.bufferSendIn 
+
+      myo.move -> mega.move
     }
 
   }

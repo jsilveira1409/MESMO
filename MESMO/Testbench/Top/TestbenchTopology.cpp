@@ -57,7 +57,10 @@ enum TopologyConstants {
     DEFRAMER_BUFFER_COUNT = 30,
     COM_DRIVER_BUFFER_SIZE = 3000,
     COM_DRIVER_BUFFER_COUNT = 30,
-    BUFFER_MANAGER_ID = 200
+    BUFFER_MANAGER_ID = 200,
+    SUBSYSTEMS_DRIVER_BUFFER_SIZE = 491520,
+    SUBSYSTEMS_DRIVER_BUFFER_COUNT = 30,
+    SUBSYSTEMS_BUFFER_MANAGER_ID = 201
 };
 
 // Ping entries are autocoded, however; this code is not properly exported. Thus, it is copied here.
@@ -117,6 +120,26 @@ void configureTopology() {
     upBuffMgrBins.bins[2].numBuffers = COM_DRIVER_BUFFER_COUNT;
     bufferManager.setup(BUFFER_MANAGER_ID, 0, mallocator, upBuffMgrBins);
 
+    Svc::BufferManager::BufferBins subsystemsBuffMgrBins;
+    memset(&subsystemsBuffMgrBins, 0, sizeof(subsystemsBuffMgrBins));
+    subsystemsBuffMgrBins.bins[0].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[0].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[1].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[1].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[2].bufferSize = SUBSYSTEMS_DRIVER_BUFFER_SIZE;
+    subsystemsBuffMgrBins.bins[2].numBuffers = SUBSYSTEMS_DRIVER_BUFFER_COUNT;
+    subsystemsBuffMgrBins.bins[3].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[3].numBuffers = 20;
+    subsystemsBuffMgrBins.bins[4].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[4].numBuffers = 20;
+    subsystemsBuffMgrBins.bins[5].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[5].numBuffers = 20;
+    subsystemsBuffMgrBins.bins[5].bufferSize = 2048;
+    subsystemsBuffMgrBins.bins[5].numBuffers = 20;
+    subsystemsFileUplinkBufferManager.setup(SUBSYSTEMS_BUFFER_MANAGER_ID, 0, mallocator, subsystemsBuffMgrBins);
+
+    
+
     // Framer and Deframer components need to be passed a protocol handler
     framer.setup(framing);
     deframer.setup(deframing);
@@ -150,6 +173,15 @@ void setupTopology(const TopologyState& state) {
     // Autocoded parameter loading. Function provided by autocoder.
     // loadParameters();
     // Autocoded task kick-off (active components). Function provided by autocoder.
+    bool active = active_gpio_comm.open(4, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+    if (active == false){
+        printf("failed to open active gpio\n");
+    }
+    bool passive = passive_gpio_comm.open(17, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+    if (passive == false){
+        printf("failed to open passive gpio\n");
+    }
+
     startTasks(state);
     if (state.uartDevice != nullptr) {
         Os::TaskString name("ReceiveTask");
@@ -162,9 +194,62 @@ void setupTopology(const TopologyState& state) {
         }
     }
 
-    //active_gpio_comm.open(4, Drv::LinuxGpioDriverComponentImpl::GPIO_OUT);
+     // Mega
+    bool mega_com_open = false;
+    if (state.megaComm == nullptr) {
+        printf("Mega Comm is null. Defaulting to /dev/ttyAMA5\n");
+        mega_com_open = mega_comm.open("/dev/ttyAMA5", Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
+    }else{
+        mega_com_open = mega_comm.open(state.megaComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 1024);
+        
+    }
+    printf("Arduino Mega Driver Open : %d\n", mega_com_open);
+    mega_comm.startReadThread();
+    mega.set_comm();
+    
+    //On board Camera
+    Os::TaskString CameraTask("CameraTask");
+    camera_comm.configure("0.0.0.0", 50001);
+    camera_comm.startSocketTask(CameraTask, true, COMM_PRIORITY, Default::STACK_SIZE);
 
+    //GPS
+    if (state.gpsComm == nullptr) {
+        printf("GPS Comm is null. Defaulting to AMA4\n");
+        bool gps_com_open = gps_comm.open("/dev/ttyAMA4", Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+        printf("GPS Driver Open : %d\n", gps_com_open);
+        gps_comm.startReadThread();
+    }else{
+        bool gps_com_open = gps_comm.open(state.gpsComm, Drv::LinuxUartDriver::BAUD_9600, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+        printf("GPS Driver Open : %d\n", gps_com_open);
+        gps_comm.startReadThread();
+    }
+
+    //Nano
+    bool nano_com_open = false;
+    if (state.nanoComm == nullptr) {
+        printf("Nano Comm is null\n");
+    }else{
+        nano_com_open = nano_comm.open(state.nanoComm, Drv::LinuxUartDriver::BAUD_115K, Drv::LinuxUartDriver::NO_FLOW, Drv::LinuxUartDriver::PARITY_NONE, 512);
+        nano_comm.startReadThread();
+    }    
+    printf("Arduino Nano Driver Open : %d\n", nano_com_open);
+
+    //MYO
+    Os::TaskString MyoTask("CameraTask");
+    myo_comm.configure("0.0.0.0", 50002);
+    myo_comm.startSocketTask(MyoTask, true, COMM_PRIORITY, Default::STACK_SIZE);
+
+    //MKR
+    bool mkr_com_open = false;
+    if (state.mkrComm == nullptr) {
+        printf("MKR Comm is null\n");
+        mkr_com_open = mkr1000_comm.open("/dev/i2c-1");
+    }else{
+        mkr_com_open = mkr1000_comm.open(state.mkrComm);
+    }
+    printf("Arduino MKR Driver Open : %d\n", mkr_com_open);
 }
+
 
 // Variables used for cycle simulation
 Os::Mutex cycleLock;

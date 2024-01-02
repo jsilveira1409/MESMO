@@ -25,6 +25,10 @@ namespace Testbench {
 struct TopologyState {
     const CHAR* uartDevice;
     U32 baudRate;
+    const CHAR* nanoComm;
+    const CHAR* megaComm;
+    const CHAR* gpsComm;
+    const CHAR* mkrComm;
 };
 
 /**
@@ -81,6 +85,9 @@ namespace rateGroup2 {
 enum { WARN = 3, FATAL = 5 };
 }
 namespace rateGroup3 {
+enum { WARN = 3, FATAL = 5 };
+}
+namespace subsystemsFileUplink {
 enum { WARN = 3, FATAL = 5 };
 }
 }  // namespace PingEntries

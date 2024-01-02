@@ -16,6 +16,7 @@ set(MOD_DEPS
   Svc/LinuxTime
   # Communication Implementations
   Drv/Udp
+  Drv/TcpClient
   Drv/LinuxUartDriver
 )
 

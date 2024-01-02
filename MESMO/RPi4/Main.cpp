@@ -84,7 +84,11 @@ int main(int argc, char* argv[]) {
             case '?':
             // Default case: output help and exit
             default:
-                print_usage(argv[0]);
+                print_usage(argv[0]);//namespace name
+                {
+                    
+                } // namespace name
+                
                 return (option == 'h') ? 0 : 1;
         }
     }
@@ -96,7 +100,6 @@ int main(int argc, char* argv[]) {
     inputs.megaComm = megaComm;
     inputs.gpsComm = gpsComm;
     inputs.mkrComm = mkrComm;
-    printf("input.nanoComm: %s\n", inputs.nanoComm);
     // Setup program shutdown via Ctrl-C
     signal(SIGINT, signalHandler);
     signal(SIGTERM, signalHandler);

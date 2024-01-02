@@ -148,6 +148,9 @@ module RPI {
     stack size Default.stackSize \
     priority 30
 
+  
+  
+
   # ----------------------------------------------------------------------
   # Queued component instances
   # ----------------------------------------------------------------------
@@ -463,6 +466,8 @@ module RPI {
     uartBufferManager.cleanup();
     """
   }
+
+
 
 
 }

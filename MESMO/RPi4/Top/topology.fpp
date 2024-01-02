@@ -66,8 +66,6 @@ module RPi4 {
 
     instance nano
     instance nano_comm
-    #instance nano_deframer
-    #instance nano_framer
 
     instance myo
     instance myo_comm

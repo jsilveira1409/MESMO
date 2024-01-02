@@ -49,9 +49,15 @@ int main(int argc, char* argv[]) {
     I32 option = 0;
     CHAR* uart_device = nullptr;
     U32 baud_rate = 0;
+    CHAR* hostname = nullptr;
+    CHAR* nanoComm = nullptr;
+    CHAR* megaComm = nullptr;
+    CHAR* gpsComm = nullptr;
+    CHAR* mkrComm = nullptr;
+    U16 port_number = 0;
 
     // Loop while reading the getopt supplied options
-    while ((option = getopt(argc, argv, "hb:d:")) != -1) {
+    while ((option = getopt(argc, argv, "hb:d:a:m:n:g:k:")) != -1) {
         switch (option) {
             // Handle the -b baud rate argument
             case 'b':
@@ -60,6 +66,18 @@ int main(int argc, char* argv[]) {
             // Handle the -d device argument
             case 'd':
                 uart_device = optarg;
+                break;
+            case 'n':
+                nanoComm = optarg;
+                break;
+            case 'm':
+                megaComm = optarg;
+                break;
+            case 'g':
+                gpsComm = optarg;
+                break;
+            case 'k':
+                mkrComm = optarg;
                 break;
             // Cascade intended: help output
             case 'h':
@@ -75,6 +93,10 @@ int main(int argc, char* argv[]) {
     Testbench::TopologyState inputs;
     inputs.baudRate = baud_rate;
     inputs.uartDevice = uart_device;
+    inputs.nanoComm = nanoComm;
+    inputs.megaComm = megaComm;
+    inputs.gpsComm = gpsComm;
+    inputs.mkrComm = mkrComm;
 
     // Setup program shutdown via Ctrl-C
     signal(SIGINT, signalHandler);
