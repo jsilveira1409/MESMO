@@ -10,7 +10,7 @@ The Objective of this project is to study in depth the \textit{F'} framework and
 
 To comprehensively assess the MESMO project's performance and communication efficiency, a meticulously crafted testbench has been implemented. This testbench analysis various scenarios and subsystem configurations, particularly focusing on the time elapsed from message reception to command execution. 
 
-[![Functional Video]](https://www.youtube.com/watch?v=4ISu5jYeB7Q&ab_channel=JoaquimSilveira)
+[Functional Video](https://www.youtube.com/watch?v=4ISu5jYeB7Q&ab_channel=JoaquimSilveira)
 
 ## Subsystems 
 ### Robotic Arm and MYO Armband
