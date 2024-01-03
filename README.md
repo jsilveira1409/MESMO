@@ -12,13 +12,19 @@ To comprehensively assess the MESMO project's performance and communication effi
 
 [Functional Video](https://www.youtube.com/watch?v=4ISu5jYeB7Q&ab_channel=JoaquimSilveira)
 
-![](imgs/topology-Hw Setup.jpg)
+[Research Paper]()
 
-![](imgs/1.jpg)
-![](imgs/2.jpg)
-![](imgs/4.jpg)
-![](imgs/5.jpg)
-![](imgs/6.jpg)
+
+<table>
+  <tr>
+    <td align="center"><img src="imgs/1.jpg" alt="Image 1" width="500"/></td>
+    <td align="center"><img src="imgs/2.jpg" alt="Image 2" width="500"/></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="imgs/5.jpg" alt="Image 3" width="500"/></td>
+    <td align="center"><img src="imgs/6.jpg" alt="Image 4" width="500"/></td>
+  </tr>
+</table>
 
 ## Subsystems 
 ### Robotic Arm and MYO Armband
@@ -30,7 +36,10 @@ To comprehensively assess the MESMO project's performance and communication effi
 ### Raspberry Pi Camera
 ![](imgs/camera.gif)
 
+## Topologies
+### RPi4 Topology
+![](imgs/rpi_top.jpg)
 
 
-
-
+### Ref Topology
+![](imgs/topology-Ref.jpg)
