@@ -12,7 +12,7 @@ To comprehensively assess the MESMO project's performance and communication effi
 
 [Functional Video](https://www.youtube.com/watch?v=4ISu5jYeB7Q&ab_channel=JoaquimSilveira)
 
-[Research Paper]()
+[Research Paper](https://drive.google.com/file/d/1KU-fd9dzQs_Eaz5O2uu-f7RJc5SqWHSU/view?usp=drive_link)
 
 
 <table>
